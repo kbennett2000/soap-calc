@@ -81,7 +81,9 @@ to confirm.
 > Expected output: a version number starting with `v20`, `v22`, or higher
 > (for example `v20.18.1`).
 >
-> If you see something different, see TROUBLESHOOTING.md (coming soon).
+> If `node` isn't found or returns an older version, see
+> [The service won't start](TROUBLESHOOTING.md#the-service-wont-start)
+> in TROUBLESHOOTING.md — the Node-version section covers this.
 
 If the version is older than `v20` (some older Ubuntu LTS releases ship an
 older Node in apt), install a newer Node from NodeSource by following
@@ -226,8 +228,9 @@ sudo systemctl enable --now soapcalc
 > Expected output: somewhere in the first few lines you should see
 > `Active: active (running)`. Press `q` to exit the status view.
 >
-> If you see `failed` or `inactive` instead, see TROUBLESHOOTING.md
-> (coming soon).
+> If you see `failed` or `inactive` instead, see
+> [The service won't start](TROUBLESHOOTING.md#the-service-wont-start)
+> in TROUBLESHOOTING.md.
 
 > **✓ Verify**
 >
@@ -235,7 +238,9 @@ sudo systemctl enable --now soapcalc
 >
 > Expected output: `{"status":"ok"}`
 >
-> If you see something different, see TROUBLESHOOTING.md (coming soon).
+> If you see something different, see
+> [The service won't start](TROUBLESHOOTING.md#the-service-wont-start)
+> in TROUBLESHOOTING.md.
 > (If you changed the port in Step 6, use your new port number instead
 > of 8030.)
 
@@ -291,7 +296,9 @@ changed it. Example: `http://192.168.1.42:8030`.
 > preset buttons (for example, **410 g**) and the other ingredients fill
 > in with computed weights. The page is touch-friendly on a phone.
 >
-> If the page doesn't load at all, see TROUBLESHOOTING.md (coming soon).
+> If the page doesn't load at all, see
+> [I can't reach the calculator from my phone](TROUBLESHOOTING.md#i-cant-reach-the-calculator-from-my-phone)
+> in TROUBLESHOOTING.md.
 
 This is what it should look like on a phone:
 
@@ -319,7 +326,9 @@ calculator URL from your other device.
 > The calculator page loads from your other device — without you having
 > to touch the server, log back in, or run any commands.
 >
-> If it doesn't load, see TROUBLESHOOTING.md (coming soon).
+> If it doesn't load, see
+> [The calculator didn't come back up after a reboot](TROUBLESHOOTING.md#the-calculator-didnt-come-back-up-after-a-reboot)
+> in TROUBLESHOOTING.md.
 
 ---
 

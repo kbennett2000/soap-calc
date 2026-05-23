@@ -35,8 +35,8 @@ network to use it.
 ## Documentation
 
 - [Install guide](docs/INSTALL.md) — step-by-step setup on a fresh Ubuntu Server
-- User guide (coming soon)
-- Troubleshooting (coming soon)
+- [User guide](docs/USER_GUIDE.md) — features and day-to-day workflows
+- [Troubleshooting](docs/TROUBLESHOOTING.md) — common problems and fixes
 
 ## Specification
 
