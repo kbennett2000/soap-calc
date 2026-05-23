@@ -98,12 +98,24 @@
     }
     .btn:hover { background: #e6e9ee; }
     .btn:active { transform: translateY(1px); }
+    .btn:disabled,
+    .btn[disabled] {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
     .btn-primary {
       background: var(--accent);
       color: #fff;
       border-color: var(--accent);
     }
     .btn-primary:hover { background: var(--accent-dark); }
+    .btn-danger {
+      background: var(--bg);
+      color: var(--error);
+      border-color: var(--border);
+    }
+    .btn-danger:hover { background: var(--error-soft); }
 
     .btn-link {
       background: transparent;
@@ -398,6 +410,163 @@
     }
     .settings-actions .spacer { flex: 1; }
 
+    /* --- Recipe action bar (top of main view) --- */
+    .recipe-action-bar {
+      display: flex;
+      gap: 10px;
+    }
+    .recipe-action-bar .btn {
+      flex: 1;
+      min-height: 48px;
+      font-size: 16px;
+    }
+
+    /* --- Modals --- */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 22, 26, 0.42);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-backdrop[hidden] { display: none; }
+    .modal-card {
+      background: var(--bg);
+      border-radius: 12px;
+      max-width: 520px;
+      width: 100%;
+      max-height: calc(100vh - 48px);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .modal-header h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      flex: 1;
+    }
+    .modal-body {
+      padding: 16px 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .modal-actions {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    .modal-actions .btn { min-height: 48px; }
+    .modal-label {
+      display: block;
+      font-weight: 600;
+      margin: 0 0 6px;
+      font-size: 15px;
+    }
+    .modal-label + .modal-input { margin-bottom: 12px; }
+    input.modal-input,
+    textarea.modal-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 10px 12px;
+      font: inherit;
+      font-size: 17px;
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+    }
+    textarea.modal-input {
+      resize: vertical;
+      min-height: 84px;
+      line-height: 1.4;
+    }
+    .modal-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .modal-input.invalid {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px var(--error-soft);
+    }
+    .modal-error {
+      color: var(--error);
+      font-size: 14px;
+      margin: -6px 0 12px;
+      display: block;
+    }
+
+    /* --- Recipe list (inside Load modal) --- */
+    .recipe-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .recipe-row {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .recipe-row-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .recipe-name {
+      font-weight: 600;
+      font-size: 17px;
+      flex: 1;
+      min-width: 0;
+      word-break: break-word;
+    }
+    .recipe-date {
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .recipe-notes {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 6px;
+      word-break: break-word;
+    }
+    .recipe-row-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .recipe-row-actions .btn {
+      flex: 1;
+      min-width: 0;
+      min-height: 44px;
+      font-size: 15px;
+    }
+    .recipe-empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 12px;
+      font-size: 16px;
+    }
+    .recipe-rename-input {
+      flex: 1;
+      min-width: 0;
+    }
+
     /* --- Toast --- */
     .toast {
       position: fixed;
@@ -436,6 +605,15 @@
       }
       .settings-actions .btn { flex: 1 1 auto; min-width: 0; }
       .settings-actions .spacer { display: none; }
+
+      .modal-backdrop { padding: 0; }
+      .modal-card {
+        max-width: none;
+        max-height: 100vh;
+        height: 100vh;
+        border-radius: 0;
+      }
+      .modal-actions .btn { flex: 1; min-width: 0; }
     }
 
     @media (max-width: 380px) {
@@ -446,6 +624,38 @@
 </head>
 <body>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <div id="save-modal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="save-modal-title">
+      <div class="modal-header">
+        <h2 id="save-modal-title">Save recipe</h2>
+      </div>
+      <div class="modal-body">
+        <label class="modal-label" for="save-recipe-name">Name</label>
+        <input id="save-recipe-name" class="modal-input" type="text" autocomplete="off" maxlength="120">
+        <span id="save-name-error" class="modal-error" hidden></span>
+        <label class="modal-label" for="save-recipe-notes">Notes (optional)</label>
+        <textarea id="save-recipe-notes" class="modal-input" rows="3" maxlength="2000"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-save-modal-cancel>Cancel</button>
+        <button type="button" class="btn btn-primary" data-save-modal-confirm>Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="load-modal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="load-modal-title">
+      <div class="modal-header">
+        <h2 id="load-modal-title">Load recipe</h2>
+        <button type="button" class="btn-link" data-load-modal-close>Close</button>
+      </div>
+      <div class="modal-body">
+        <div id="recipe-list" class="recipe-list" aria-live="polite"></div>
+        <p id="recipe-empty-state" class="recipe-empty-state" hidden>No saved recipes yet.</p>
+      </div>
+    </div>
+  </div>
 
   <main>
     <section id="main-view" class="view">
@@ -464,6 +674,13 @@
           <button type="button" class="preset-btn" data-preset="820">820 g</button>
           <button type="button" class="preset-btn" data-preset="1025">1025 g</button>
           <button type="button" class="preset-btn" data-preset="1230">1230 g</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="recipe-action-bar" role="group" aria-label="Recipe actions">
+          <button type="button" class="btn" data-save-recipe disabled>Save Recipe</button>
+          <button type="button" class="btn" data-load-recipe>Load Recipe</button>
         </div>
       </section>
 
@@ -760,6 +977,7 @@
       state.anchorWeightG = null;
       FIELDS.forEach(function (field) { $field(field).value = ''; });
       renderAnchorClass();
+      updateSaveRecipeEnabled();
     }
 
     function onInput(e) {
@@ -776,6 +994,7 @@
       state.anchorWeightG = grams;
       renderAnchorClass();
       renderAllInputs(field);
+      updateSaveRecipeEnabled();
     }
 
     function onBlur(e) {
@@ -792,6 +1011,7 @@
       FIELDS.forEach(function (field) {
         $field(field).value = formatWeight(field === 'lard' ? grams : weightForField(field));
       });
+      updateSaveRecipeEnabled();
     }
 
     function setEoType(type) {
@@ -975,10 +1195,14 @@
           if (!fresh) return;
           var freshSet = fresh.factor_sets && fresh.factor_sets.default;
           if (!freshSet) return;
-          if (factorsEqual(state.factors, freshSet)) return;
-          var beforeDisplay = captureDisplay();
+          var factorsDiffer = !factorsEqual(state.factors, freshSet);
+          // Always absorb the fresh blob — recipes/settings may have changed
+          // even when factors haven't, and we don't want a subsequent local
+          // PUT to clobber another tab's writes.
+          var beforeDisplay = factorsDiffer ? captureDisplay() : null;
           state.data = fresh;
           state.factors = freshSet;
+          if (!factorsDiffer) return;
           renderFactorCells();
           if (state.anchorWeightG != null) {
             renderAllInputs(state.anchorField);
@@ -1043,6 +1267,315 @@
       document.querySelector('[data-done-measuring]').hidden = true;
     }
 
+    // ---- recipes (SPEC §3.3) ----
+
+    function updateSaveRecipeEnabled() {
+      var btn = document.querySelector('[data-save-recipe]');
+      if (btn) btn.disabled = (state.anchorWeightG == null);
+    }
+
+    function genRecipeId() {
+      return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    }
+
+    function formatRecipeDate(iso) {
+      if (!iso) return '';
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      try {
+        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      } catch (e) {
+        return iso;
+      }
+    }
+
+    function bodyScrollLock(locked) {
+      document.body.style.overflow = locked ? 'hidden' : '';
+    }
+
+    function openSaveModal() {
+      if (state.anchorWeightG == null) return;
+      var nameEl = document.getElementById('save-recipe-name');
+      var notesEl = document.getElementById('save-recipe-notes');
+      var errorEl = document.getElementById('save-name-error');
+      nameEl.value = '';
+      nameEl.classList.remove('invalid');
+      notesEl.value = '';
+      errorEl.hidden = true;
+      errorEl.textContent = '';
+      document.getElementById('save-modal').hidden = false;
+      bodyScrollLock(true);
+      setTimeout(function () { nameEl.focus(); }, 30);
+    }
+
+    function closeSaveModal() {
+      document.getElementById('save-modal').hidden = true;
+      bodyScrollLock(false);
+    }
+
+    function saveRecipeFromModal() {
+      var nameEl = document.getElementById('save-recipe-name');
+      var notesEl = document.getElementById('save-recipe-notes');
+      var errorEl = document.getElementById('save-name-error');
+      nameEl.classList.remove('invalid');
+      errorEl.hidden = true;
+      errorEl.textContent = '';
+
+      var name = nameEl.value.trim();
+      if (name === '') {
+        nameEl.classList.add('invalid');
+        errorEl.textContent = 'Please enter a name.';
+        errorEl.hidden = false;
+        nameEl.focus();
+        return;
+      }
+      if (state.anchorWeightG == null) {
+        errorEl.textContent = 'No recipe to save. Enter a weight first.';
+        errorEl.hidden = false;
+        return;
+      }
+
+      var recipe = {
+        id: genRecipeId(),
+        name: name,
+        factor_set_id: 'default',
+        anchor_field: state.anchorField,
+        anchor_value_g: state.anchorWeightG,
+        eo_type: state.eoType,
+        notes: notesEl.value || '',
+        created_at: new Date().toISOString()
+      };
+
+      var newData = JSON.parse(JSON.stringify(state.data));
+      newData.recipes = (newData.recipes || []).slice();
+      newData.recipes.push(recipe);
+
+      var confirmBtn = document.querySelector('[data-save-modal-confirm]');
+      confirmBtn.disabled = true;
+
+      fetch('/api/data', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newData)
+      }).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      }).then(function () {
+        state.data = newData;
+        confirmBtn.disabled = false;
+        closeSaveModal();
+        showToast('Recipe saved');
+      }).catch(function (err) {
+        confirmBtn.disabled = false;
+        errorEl.textContent = 'Save failed: ' + err.message;
+        errorEl.hidden = false;
+      });
+    }
+
+    function openLoadModal() {
+      // Re-fetch so cross-tab additions are visible
+      fetch('/api/data', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (fresh) {
+          if (fresh) state.data = fresh;
+          renderRecipeList();
+          document.getElementById('load-modal').hidden = false;
+          bodyScrollLock(true);
+        })
+        .catch(function () {
+          renderRecipeList();
+          document.getElementById('load-modal').hidden = false;
+          bodyScrollLock(true);
+        });
+    }
+
+    function closeLoadModal() {
+      document.getElementById('load-modal').hidden = true;
+      bodyScrollLock(false);
+    }
+
+    function renderRecipeList() {
+      var listEl = document.getElementById('recipe-list');
+      var emptyEl = document.getElementById('recipe-empty-state');
+      listEl.innerHTML = '';
+      var recipes = ((state.data && state.data.recipes) || []).slice();
+      recipes.sort(function (a, b) {
+        return String(b.created_at || '').localeCompare(String(a.created_at || ''));
+      });
+      if (recipes.length === 0) {
+        listEl.hidden = true;
+        emptyEl.hidden = false;
+        return;
+      }
+      listEl.hidden = false;
+      emptyEl.hidden = true;
+      recipes.forEach(function (r) { listEl.appendChild(buildRecipeRow(r)); });
+    }
+
+    function buildRecipeRow(recipe) {
+      var row = document.createElement('div');
+      row.className = 'recipe-row';
+      row.dataset.recipeId = recipe.id;
+
+      var head = document.createElement('div');
+      head.className = 'recipe-row-head';
+      var nameEl = document.createElement('div');
+      nameEl.className = 'recipe-name';
+      nameEl.textContent = recipe.name;
+      var dateEl = document.createElement('div');
+      dateEl.className = 'recipe-date';
+      dateEl.textContent = formatRecipeDate(recipe.created_at);
+      head.appendChild(nameEl);
+      head.appendChild(dateEl);
+      row.appendChild(head);
+
+      var notesText = (recipe.notes || '').trim();
+      if (notesText) {
+        var notesEl = document.createElement('div');
+        notesEl.className = 'recipe-notes';
+        var preview = notesText.length > 40 ? notesText.slice(0, 40) + '…' : notesText;
+        notesEl.textContent = preview;
+        row.appendChild(notesEl);
+      }
+
+      var actions = document.createElement('div');
+      actions.className = 'recipe-row-actions';
+      var loadBtn = document.createElement('button');
+      loadBtn.type = 'button';
+      loadBtn.className = 'btn btn-primary';
+      loadBtn.textContent = 'Load';
+      loadBtn.addEventListener('click', function () { loadRecipe(recipe.id); });
+      var renameBtn = document.createElement('button');
+      renameBtn.type = 'button';
+      renameBtn.className = 'btn';
+      renameBtn.textContent = 'Rename';
+      renameBtn.addEventListener('click', function () { startRenameRecipe(row, recipe); });
+      var deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'btn btn-danger';
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.addEventListener('click', function () { deleteRecipe(recipe); });
+      actions.appendChild(loadBtn);
+      actions.appendChild(renameBtn);
+      actions.appendChild(deleteBtn);
+      row.appendChild(actions);
+      return row;
+    }
+
+    function startRenameRecipe(row, recipe) {
+      var nameEl = row.querySelector('.recipe-name');
+      var actions = row.querySelector('.recipe-row-actions');
+
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'modal-input recipe-rename-input';
+      input.value = recipe.name;
+      input.maxLength = 120;
+      nameEl.replaceWith(input);
+
+      actions.innerHTML = '';
+      var saveBtn = document.createElement('button');
+      saveBtn.type = 'button';
+      saveBtn.className = 'btn btn-primary';
+      saveBtn.textContent = 'Save';
+      var cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'btn';
+      cancelBtn.textContent = 'Cancel';
+      actions.appendChild(cancelBtn);
+      actions.appendChild(saveBtn);
+
+      function commit() {
+        var newName = input.value.trim();
+        if (newName === '') {
+          input.classList.add('invalid');
+          input.focus();
+          return;
+        }
+        if (newName === recipe.name) {
+          renderRecipeList();
+          return;
+        }
+        renameRecipe(recipe.id, newName);
+      }
+      cancelBtn.addEventListener('click', function () { renderRecipeList(); });
+      saveBtn.addEventListener('click', commit);
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') commit();
+        else if (e.key === 'Escape') renderRecipeList();
+      });
+      input.focus();
+      input.select();
+    }
+
+    function renameRecipe(id, newName) {
+      var newData = JSON.parse(JSON.stringify(state.data));
+      var recipes = newData.recipes || [];
+      var idx = -1;
+      for (var i = 0; i < recipes.length; i++) {
+        if (recipes[i].id === id) { idx = i; break; }
+      }
+      if (idx < 0) return;
+      recipes[idx].name = newName;
+      fetch('/api/data', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newData)
+      }).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        state.data = newData;
+        renderRecipeList();
+        showToast('Recipe renamed');
+      }).catch(function () {
+        showToast('Rename failed');
+        renderRecipeList();
+      });
+    }
+
+    function deleteRecipe(recipe) {
+      if (!confirm("Delete '" + recipe.name + "'?")) return;
+      var newData = JSON.parse(JSON.stringify(state.data));
+      newData.recipes = (newData.recipes || []).filter(function (r) { return r.id !== recipe.id; });
+      fetch('/api/data', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newData)
+      }).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        state.data = newData;
+        renderRecipeList();
+        showToast('Recipe deleted');
+      }).catch(function () {
+        showToast('Delete failed');
+      });
+    }
+
+    function loadRecipe(id) {
+      var recipe = ((state.data && state.data.recipes) || []).find(function (r) { return r.id === id; });
+      if (!recipe) return;
+
+      if (state.measuring) exitMeasuring();
+
+      state.anchorField = recipe.anchor_field;
+      state.anchorWeightG = recipe.anchor_value_g;
+      if (recipe.eo_type && recipe.eo_type !== state.eoType) {
+        state.eoType = recipe.eo_type;
+        document.querySelectorAll('[data-eo-btn]').forEach(function (b) {
+          b.setAttribute('aria-pressed', b.dataset.eoBtn === state.eoType ? 'true' : 'false');
+        });
+        renderFactorCells();
+      }
+
+      renderAnchorClass();
+      FIELDS.forEach(function (field) {
+        var g = field === state.anchorField ? state.anchorWeightG : weightForField(field);
+        $field(field).value = formatWeight(g);
+      });
+      updateSaveRecipeEnabled();
+      closeLoadModal();
+      showToast('Loaded: ' + recipe.name);
+    }
+
     // ---- wiring ----
 
     function wireEvents() {
@@ -1085,6 +1618,11 @@
       document.querySelectorAll('input[data-check]').forEach(function (cb) {
         cb.addEventListener('change', onCheckboxToggle);
       });
+      document.querySelector('[data-save-recipe]').addEventListener('click', openSaveModal);
+      document.querySelector('[data-load-recipe]').addEventListener('click', openLoadModal);
+      document.querySelector('[data-save-modal-cancel]').addEventListener('click', closeSaveModal);
+      document.querySelector('[data-save-modal-confirm]').addEventListener('click', saveRecipeFromModal);
+      document.querySelector('[data-load-modal-close]').addEventListener('click', closeLoadModal);
       document.addEventListener('visibilitychange', onVisibilityChange);
     }
 
@@ -1110,6 +1648,7 @@
       });
       renderFactorCells();
       renderAnchorClass();
+      updateSaveRecipeEnabled();
     }
 
     function init() {
