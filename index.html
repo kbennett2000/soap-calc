@@ -13,12 +13,14 @@
       --row-bg: #ffffff;
       --row-alt: #f7f8fa;
       --accent: #1d4ed8;
+      --accent-dark: #1742b8;
       --accent-soft: #dbe7ff;
       --toggle-bg: #eef0f3;
       --toggle-active-bg: #1a1a1a;
       --toggle-active-fg: #ffffff;
       --flash: #fff4c2;
       --error: #b91c1c;
+      --error-soft: #fde2e2;
     }
 
     * { box-sizing: border-box; }
@@ -40,10 +42,17 @@
       padding: 16px;
     }
 
-    h1 {
+    .view-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 0 16px;
+    }
+    .view-header h1 {
       font-size: 28px;
       font-weight: 600;
-      margin: 8px 0 16px;
+      margin: 0;
+      flex: 1;
     }
 
     .status {
@@ -52,7 +61,13 @@
       margin: 0 0 16px;
       min-height: 1.4em;
     }
-    .status.error { color: var(--error); }
+    .status.error {
+      color: var(--error);
+      background: var(--error-soft);
+      padding: 8px 12px;
+      border-radius: 8px;
+      min-height: auto;
+    }
 
     /* --- Section blocks --- */
     .section {
@@ -66,6 +81,43 @@
       color: var(--muted);
       margin: 0 0 8px;
     }
+
+    /* --- Generic buttons --- */
+    .btn {
+      min-height: 48px;
+      padding: 0 16px;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      background: var(--toggle-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .btn:hover { background: #e6e9ee; }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .btn-primary:hover { background: var(--accent-dark); }
+
+    .btn-link {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 15px;
+      min-height: 44px;
+      padding: 0 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .btn-link:hover { background: var(--accent-soft); }
 
     /* --- Preset buttons --- */
     .presets {
@@ -177,7 +229,6 @@
       padding-left: 0;
     }
 
-    /* column widths */
     .col-name   { width: 38%; }
     .col-factor { width: 22%; }
     .col-input  { width: auto; }
@@ -219,7 +270,6 @@
       font-size: 0.9em;
     }
 
-    /* flash animation when a row's displayed value changes from a toggle */
     @keyframes rowFlash {
       0%   { background-color: var(--flash); }
       100% { background-color: transparent; }
@@ -230,9 +280,87 @@
       background-color: var(--flash);
     }
 
+    /* --- Settings view --- */
+    .settings-form {
+      display: grid;
+      gap: 16px;
+    }
+    .settings-field {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+    .settings-label {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .settings-label small {
+      display: block;
+      font-weight: normal;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+    input.settings-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 10px 12px;
+      font: inherit;
+      font-size: 17px;
+      font-variant-numeric: tabular-nums;
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+    }
+    input.settings-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    input.settings-input.invalid {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px var(--error-soft);
+    }
+    input.settings-input[readonly] {
+      background: #f7f8fa;
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+    .settings-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .settings-actions .spacer { flex: 1; }
+
+    /* --- Toast --- */
+    .toast {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 220ms ease-out;
+      pointer-events: none;
+    }
+    .toast[data-visible] { opacity: 1; }
+
     /* --- Responsive --- */
     @media (max-width: 520px) {
-      h1 { font-size: 24px; }
+      .view-header h1 { font-size: 22px; }
       .presets { grid-template-columns: repeat(3, 1fr); }
       .col-name   { width: 36%; }
       .col-factor { width: 22%; }
@@ -241,6 +369,13 @@
       .ingredients th, .ingredients td { padding: 8px 6px; }
       input.weight { font-size: 18px; }
       .toggle button { padding: 0 12px; font-size: 15px; }
+
+      .settings-field {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+      .settings-actions .btn { flex: 1 1 auto; min-width: 0; }
+      .settings-actions .spacer { display: none; }
     }
 
     @media (max-width: 380px) {
@@ -250,92 +385,166 @@
   </style>
 </head>
 <body>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
   <main>
-    <h1>Soap Calculator</h1>
-    <p id="status" class="status">Loading factors&hellip;</p>
-
-    <section class="section" aria-labelledby="presets-label">
-      <span id="presets-label" class="section-label">Lard presets</span>
-      <div class="presets" role="group" aria-label="Lard presets">
-        <button type="button" class="preset-btn" data-preset="205">205 g</button>
-        <button type="button" class="preset-btn" data-preset="410">410 g</button>
-        <button type="button" class="preset-btn" data-preset="615">615 g</button>
-        <button type="button" class="preset-btn" data-preset="820">820 g</button>
-        <button type="button" class="preset-btn" data-preset="1025">1025 g</button>
-        <button type="button" class="preset-btn" data-preset="1230">1230 g</button>
+    <section id="main-view" class="view">
+      <div class="view-header">
+        <h1>Soap Calculator</h1>
+        <button type="button" class="btn-link" data-show-settings>⚙ Settings</button>
       </div>
-    </section>
+      <p id="status" class="status">Loading factors&hellip;</p>
 
-    <section class="section">
-      <div class="toggles-row">
-        <div class="toggle-group">
-          <span class="section-label">Essential oil</span>
-          <div class="toggle" role="group" aria-label="Essential oil weight">
-            <button type="button" data-eo-btn="heavy" aria-pressed="true">Heavy</button>
-            <button type="button" data-eo-btn="light" aria-pressed="false">Light</button>
+      <section class="section" aria-labelledby="presets-label">
+        <span id="presets-label" class="section-label">Lard presets</span>
+        <div class="presets" role="group" aria-label="Lard presets">
+          <button type="button" class="preset-btn" data-preset="205">205 g</button>
+          <button type="button" class="preset-btn" data-preset="410">410 g</button>
+          <button type="button" class="preset-btn" data-preset="615">615 g</button>
+          <button type="button" class="preset-btn" data-preset="820">820 g</button>
+          <button type="button" class="preset-btn" data-preset="1025">1025 g</button>
+          <button type="button" class="preset-btn" data-preset="1230">1230 g</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="toggles-row">
+          <div class="toggle-group">
+            <span class="section-label">Essential oil</span>
+            <div class="toggle" role="group" aria-label="Essential oil weight">
+              <button type="button" data-eo-btn="heavy" aria-pressed="true">Heavy</button>
+              <button type="button" data-eo-btn="light" aria-pressed="false">Light</button>
+            </div>
+          </div>
+
+          <div class="toggle-group">
+            <span class="section-label">Display unit</span>
+            <div class="toggle" role="group" aria-label="Display unit">
+              <button type="button" data-unit-btn="g" aria-pressed="true">g</button>
+              <button type="button" data-unit-btn="oz" aria-pressed="false">oz</button>
+            </div>
           </div>
         </div>
+      </section>
 
-        <div class="toggle-group">
-          <span class="section-label">Display unit</span>
-          <div class="toggle" role="group" aria-label="Display unit">
-            <button type="button" data-unit-btn="g" aria-pressed="true">g</button>
-            <button type="button" data-unit-btn="oz" aria-pressed="false">oz</button>
-          </div>
+      <section class="section" aria-label="Ingredients">
+        <div class="table-wrap">
+          <table class="ingredients">
+            <thead>
+              <tr>
+                <th class="col-name">Ingredient</th>
+                <th class="col-factor">Factor</th>
+                <th class="col-input">Weight</th>
+                <th class="col-unit" aria-label="Unit"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-row="lard">
+                <td class="name">Lard</td>
+                <td class="factor" data-factor="lard"></td>
+                <td class="input-cell"><input class="weight" data-field="lard" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
+                <td class="unit" data-unit-suffix>g</td>
+              </tr>
+              <tr data-row="coconut_oil">
+                <td class="name">Coconut Oil</td>
+                <td class="factor" data-factor="coconut_oil"></td>
+                <td class="input-cell"><input class="weight" data-field="coconut_oil" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
+                <td class="unit" data-unit-suffix>g</td>
+              </tr>
+              <tr data-row="lye">
+                <td class="name">Lye</td>
+                <td class="factor" data-factor="lye"></td>
+                <td class="input-cell"><input class="weight" data-field="lye" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
+                <td class="unit" data-unit-suffix>g</td>
+              </tr>
+              <tr data-row="water">
+                <td class="name">Water</td>
+                <td class="factor" data-factor="water"></td>
+                <td class="input-cell"><input class="weight" data-field="water" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
+                <td class="unit" data-unit-suffix>g</td>
+              </tr>
+              <tr data-row="essential_oil">
+                <td class="name">Essential Oil</td>
+                <td class="factor" data-factor="essential_oil"></td>
+                <td class="input-cell"><input class="weight" data-field="essential_oil" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
+                <td class="unit" data-unit-suffix>g</td>
+              </tr>
+              <tr data-row="total" class="total-row">
+                <td class="name">Total</td>
+                <td class="factor" data-factor="total"></td>
+                <td class="input-cell"><input class="weight" data-field="total" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
+                <td class="unit" data-unit-suffix>g</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
+      </section>
     </section>
 
-    <section class="section" aria-label="Ingredients">
-      <div class="table-wrap">
-        <table class="ingredients">
-          <thead>
-            <tr>
-              <th class="col-name">Ingredient</th>
-              <th class="col-factor">Factor</th>
-              <th class="col-input">Weight</th>
-              <th class="col-unit" aria-label="Unit"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr data-row="lard">
-              <td class="name">Lard</td>
-              <td class="factor" data-factor="lard"></td>
-              <td class="input-cell"><input class="weight" data-field="lard" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
-              <td class="unit" data-unit-suffix>g</td>
-            </tr>
-            <tr data-row="coconut_oil">
-              <td class="name">Coconut Oil</td>
-              <td class="factor" data-factor="coconut_oil"></td>
-              <td class="input-cell"><input class="weight" data-field="coconut_oil" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
-              <td class="unit" data-unit-suffix>g</td>
-            </tr>
-            <tr data-row="lye">
-              <td class="name">Lye</td>
-              <td class="factor" data-factor="lye"></td>
-              <td class="input-cell"><input class="weight" data-field="lye" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
-              <td class="unit" data-unit-suffix>g</td>
-            </tr>
-            <tr data-row="water">
-              <td class="name">Water</td>
-              <td class="factor" data-factor="water"></td>
-              <td class="input-cell"><input class="weight" data-field="water" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
-              <td class="unit" data-unit-suffix>g</td>
-            </tr>
-            <tr data-row="essential_oil">
-              <td class="name">Essential Oil</td>
-              <td class="factor" data-factor="essential_oil"></td>
-              <td class="input-cell"><input class="weight" data-field="essential_oil" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
-              <td class="unit" data-unit-suffix>g</td>
-            </tr>
-            <tr data-row="total" class="total-row">
-              <td class="name">Total</td>
-              <td class="factor" data-factor="total"></td>
-              <td class="input-cell"><input class="weight" data-field="total" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
-              <td class="unit" data-unit-suffix>g</td>
-            </tr>
-          </tbody>
-        </table>
+    <section id="settings-view" class="view" hidden>
+      <div class="view-header">
+        <h1>Settings</h1>
+      </div>
+      <p id="settings-status" class="status"></p>
+
+      <section class="section">
+        <span class="section-label">Factors (weight per gram of lard)</span>
+        <div class="settings-form">
+          <label class="settings-field">
+            <span class="settings-label">
+              Lard
+              <small>locked at 1.0</small>
+            </span>
+            <input class="settings-input" type="text" value="1" readonly aria-readonly="true">
+          </label>
+          <label class="settings-field">
+            <span class="settings-label">Coconut Oil</span>
+            <input class="settings-input" data-settings-factor="coconut_oil" type="text" inputmode="decimal" autocomplete="off">
+          </label>
+          <label class="settings-field">
+            <span class="settings-label">Lye</span>
+            <input class="settings-input" data-settings-factor="lye" type="text" inputmode="decimal" autocomplete="off">
+          </label>
+          <label class="settings-field">
+            <span class="settings-label">Water</span>
+            <input class="settings-input" data-settings-factor="water" type="text" inputmode="decimal" autocomplete="off">
+          </label>
+          <label class="settings-field">
+            <span class="settings-label">Essential Oil (Heavy)</span>
+            <input class="settings-input" data-settings-factor="essential_oil_heavy" type="text" inputmode="decimal" autocomplete="off">
+          </label>
+          <label class="settings-field">
+            <span class="settings-label">Essential Oil (Light)</span>
+            <input class="settings-input" data-settings-factor="essential_oil_light" type="text" inputmode="decimal" autocomplete="off">
+          </label>
+        </div>
+      </section>
+
+      <section class="section">
+        <span class="section-label">Defaults</span>
+        <div class="settings-form">
+          <div class="settings-field">
+            <span class="settings-label">Default unit</span>
+            <div class="toggle" role="group" aria-label="Default unit">
+              <button type="button" data-settings-unit="g" aria-pressed="true">g</button>
+              <button type="button" data-settings-unit="oz" aria-pressed="false">oz</button>
+            </div>
+          </div>
+          <div class="settings-field">
+            <span class="settings-label">Default essential oil</span>
+            <div class="toggle" role="group" aria-label="Default essential oil">
+              <button type="button" data-settings-eo="heavy" aria-pressed="true">Heavy</button>
+              <button type="button" data-settings-eo="light" aria-pressed="false">Light</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="settings-actions">
+        <button type="button" class="btn" data-settings-reset>Reset to defaults</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn" data-settings-cancel>Cancel</button>
+        <button type="button" class="btn btn-primary" data-settings-save>Save</button>
       </div>
     </section>
   </main>
@@ -345,16 +554,36 @@
 
     var G_PER_OZ = 28.3495231;
     var FIELDS = ['lard', 'coconut_oil', 'lye', 'water', 'essential_oil', 'total'];
+    var FACTOR_KEYS = ['lard', 'coconut_oil', 'lye', 'water', 'essential_oil_heavy', 'essential_oil_light'];
+    var EDITABLE_FACTOR_KEYS = ['coconut_oil', 'lye', 'water', 'essential_oil_heavy', 'essential_oil_light'];
+
+    // SPEC §2.1 defaults — kept here so "Reset to defaults" doesn't depend on a fresh server fetch.
+    var DEFAULT_FACTORS = {
+      lard: 1.0,
+      coconut_oil: 0.2512195122,
+      lye: 0.1731707317,
+      water: 0.4756097561,
+      essential_oil_heavy: 0.06097560975609760,
+      essential_oil_light: 0.03658536585
+    };
+    var DEFAULT_SETTINGS = { default_unit: 'g', default_eo_type: 'heavy' };
 
     var state = {
+      data: null,
       factors: null,
       eoType: 'heavy',
       unit: 'g',
       anchorField: 'lard',
-      anchorWeightG: null
+      anchorWeightG: null,
+      view: 'main'
     };
 
     var statusEl = document.getElementById('status');
+    var settingsStatusEl = document.getElementById('settings-status');
+    var toastEl = document.getElementById('toast');
+    var toastTimer = null;
+
+    // ---- math + render ----
 
     function activeEoFactor() {
       return state.eoType === 'heavy'
@@ -465,9 +694,7 @@
         return;
       }
       var parsed = Number(raw);
-      if (!isFinite(parsed) || parsed <= 0) {
-        return;
-      }
+      if (!isFinite(parsed) || parsed <= 0) return;
       var grams = state.unit === 'g' ? parsed : parsed * G_PER_OZ;
       state.anchorField = field;
       state.anchorWeightG = grams;
@@ -522,6 +749,176 @@
       }
     }
 
+    // ---- toast ----
+
+    function showToast(message, durationMs) {
+      toastEl.textContent = message;
+      toastEl.hidden = false;
+      // force reflow so the transition runs even if we re-show quickly
+      void toastEl.offsetWidth;
+      toastEl.setAttribute('data-visible', '');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () {
+        toastEl.removeAttribute('data-visible');
+        toastTimer = setTimeout(function () { toastEl.hidden = true; toastTimer = null; }, 260);
+      }, durationMs || 2000);
+    }
+
+    // ---- views ----
+
+    function showView(name) {
+      state.view = name;
+      document.getElementById('main-view').hidden = (name !== 'main');
+      document.getElementById('settings-view').hidden = (name !== 'settings');
+      if (name === 'settings') {
+        populateSettingsForm(state.factors, state.data.settings);
+        settingsStatusEl.className = 'status';
+        settingsStatusEl.textContent = '';
+      }
+      if (name === 'main') {
+        // Re-render in case factors changed while we were elsewhere
+        renderFactorCells();
+        if (state.anchorWeightG != null) renderAllInputs(state.anchorField);
+        // Also catch up to the server in case a sibling tab pushed changes
+        refreshFactorsIfChanged({ silent: true });
+      }
+    }
+
+    // ---- settings ----
+
+    function prettyName(key) {
+      return {
+        coconut_oil: 'Coconut Oil',
+        lye: 'Lye',
+        water: 'Water',
+        essential_oil_heavy: 'Essential Oil (Heavy)',
+        essential_oil_light: 'Essential Oil (Light)'
+      }[key] || key;
+    }
+
+    function populateSettingsForm(factors, settings) {
+      EDITABLE_FACTOR_KEYS.forEach(function (k) {
+        var input = document.querySelector('[data-settings-factor="' + k + '"]');
+        input.value = String(factors[k]);
+        input.classList.remove('invalid');
+      });
+      var unit = (settings && settings.default_unit) || 'g';
+      var eo = (settings && settings.default_eo_type) || 'heavy';
+      document.querySelectorAll('[data-settings-unit]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.dataset.settingsUnit === unit ? 'true' : 'false');
+      });
+      document.querySelectorAll('[data-settings-eo]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.dataset.settingsEo === eo ? 'true' : 'false');
+      });
+    }
+
+    function settingsReset() {
+      populateSettingsForm(DEFAULT_FACTORS, DEFAULT_SETTINGS);
+      settingsStatusEl.className = 'status';
+      settingsStatusEl.textContent = 'Form reset to defaults. Click Save to apply.';
+    }
+
+    function settingsCancel() {
+      showView('main');
+    }
+
+    function settingsSave() {
+      settingsStatusEl.className = 'status';
+      settingsStatusEl.textContent = '';
+
+      var newFactors = { lard: 1.0 };
+      var badNames = [];
+      EDITABLE_FACTOR_KEYS.forEach(function (k) {
+        var input = document.querySelector('[data-settings-factor="' + k + '"]');
+        var raw = input.value.trim();
+        var n = Number(raw);
+        input.classList.remove('invalid');
+        if (raw === '' || !isFinite(n) || n <= 0) {
+          input.classList.add('invalid');
+          badNames.push(prettyName(k));
+        } else {
+          newFactors[k] = n;
+        }
+      });
+
+      if (badNames.length) {
+        settingsStatusEl.className = 'status error';
+        settingsStatusEl.textContent = 'Each factor must be a positive number. Fix: ' + badNames.join(', ') + '.';
+        return;
+      }
+
+      var newUnit = document.querySelector('[data-settings-unit][aria-pressed="true"]').dataset.settingsUnit;
+      var newEo = document.querySelector('[data-settings-eo][aria-pressed="true"]').dataset.settingsEo;
+
+      var newData = JSON.parse(JSON.stringify(state.data));
+      newData.factor_sets.default = newFactors;
+      newData.settings.default_unit = newUnit;
+      newData.settings.default_eo_type = newEo;
+
+      settingsStatusEl.className = 'status';
+      settingsStatusEl.textContent = 'Saving…';
+
+      fetch('/api/data', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newData)
+      }).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      }).then(function () {
+        state.data = newData;
+        state.factors = newData.factor_sets.default;
+        renderFactorCells();
+        if (state.anchorWeightG != null) renderAllInputs(state.anchorField);
+        showView('main');
+        showToast('Settings saved');
+      }).catch(function (err) {
+        settingsStatusEl.className = 'status error';
+        settingsStatusEl.textContent = 'Save failed: ' + err.message + '. Your edits are still here.';
+      });
+    }
+
+    // ---- visibility / cross-tab refresh ----
+
+    function factorsEqual(a, b) {
+      for (var i = 0; i < FACTOR_KEYS.length; i++) {
+        var k = FACTOR_KEYS[i];
+        if (a[k] !== b[k]) return false;
+      }
+      return true;
+    }
+
+    function refreshFactorsIfChanged(opts) {
+      opts = opts || {};
+      if (!state.data) return; // initial load hasn't finished yet
+      fetch('/api/data', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (fresh) {
+          if (!fresh) return;
+          var freshSet = fresh.factor_sets && fresh.factor_sets.default;
+          if (!freshSet) return;
+          if (factorsEqual(state.factors, freshSet)) return;
+          var beforeDisplay = captureDisplay();
+          state.data = fresh;
+          state.factors = freshSet;
+          renderFactorCells();
+          if (state.anchorWeightG != null) {
+            renderAllInputs(state.anchorField);
+            flashChangedRows(beforeDisplay);
+          }
+          if (!opts.silent) showToast('Factors updated');
+        })
+        .catch(function () { /* silent — try again on next visibility change */ });
+    }
+
+    function onVisibilityChange() {
+      if (document.visibilityState === 'visible' && state.view === 'main') {
+        refreshFactorsIfChanged();
+      }
+    }
+
+    // ---- wiring ----
+
     function wireEvents() {
       document.querySelectorAll('input[data-field]').forEach(function (i) {
         i.addEventListener('input', onInput);
@@ -536,6 +933,51 @@
       document.querySelectorAll('[data-unit-btn]').forEach(function (b) {
         b.addEventListener('click', function () { setUnit(b.dataset.unitBtn); });
       });
+      document.querySelector('[data-show-settings]').addEventListener('click', function () {
+        showView('settings');
+      });
+      document.querySelectorAll('[data-settings-unit]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          document.querySelectorAll('[data-settings-unit]').forEach(function (x) {
+            x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+          });
+        });
+      });
+      document.querySelectorAll('[data-settings-eo]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          document.querySelectorAll('[data-settings-eo]').forEach(function (x) {
+            x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+          });
+        });
+      });
+      document.querySelector('[data-settings-reset]').addEventListener('click', settingsReset);
+      document.querySelector('[data-settings-cancel]').addEventListener('click', settingsCancel);
+      document.querySelector('[data-settings-save]').addEventListener('click', settingsSave);
+      document.addEventListener('visibilitychange', onVisibilityChange);
+    }
+
+    function applyDataFromServer(data) {
+      var set = data && data.factor_sets && data.factor_sets.default;
+      if (!set) throw new Error('no default factor set in data');
+      state.data = data;
+      state.factors = set;
+      if (data.settings && data.settings.default_eo_type) {
+        state.eoType = data.settings.default_eo_type;
+      }
+      if (data.settings && data.settings.default_unit) {
+        state.unit = data.settings.default_unit;
+      }
+      document.querySelectorAll('[data-eo-btn]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.dataset.eoBtn === state.eoType ? 'true' : 'false');
+      });
+      document.querySelectorAll('[data-unit-btn]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.dataset.unitBtn === state.unit ? 'true' : 'false');
+      });
+      document.querySelectorAll('[data-unit-suffix]').forEach(function (s) {
+        s.textContent = state.unit;
+      });
+      renderFactorCells();
+      renderAnchorClass();
     }
 
     function init() {
@@ -545,26 +987,7 @@
           return r.json();
         })
         .then(function (data) {
-          var set = data && data.factor_sets && data.factor_sets.default;
-          if (!set) throw new Error('no default factor set in data');
-          state.factors = set;
-          if (data.settings && data.settings.default_eo_type) {
-            state.eoType = data.settings.default_eo_type;
-          }
-          if (data.settings && data.settings.default_unit) {
-            state.unit = data.settings.default_unit;
-          }
-          document.querySelectorAll('[data-eo-btn]').forEach(function (b) {
-            b.setAttribute('aria-pressed', b.dataset.eoBtn === state.eoType ? 'true' : 'false');
-          });
-          document.querySelectorAll('[data-unit-btn]').forEach(function (b) {
-            b.setAttribute('aria-pressed', b.dataset.unitBtn === state.unit ? 'true' : 'false');
-          });
-          document.querySelectorAll('[data-unit-suffix]').forEach(function (s) {
-            s.textContent = state.unit;
-          });
-          renderFactorCells();
-          renderAnchorClass();
+          applyDataFromServer(data);
           wireEvents();
           statusEl.textContent = '';
         })
