@@ -4,35 +4,577 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Soap Calculator</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #1a1a1a;
+      --muted: #5c6470;
+      --border: #d0d4d9;
+      --row-bg: #ffffff;
+      --row-alt: #f7f8fa;
+      --accent: #1d4ed8;
+      --accent-soft: #dbe7ff;
+      --toggle-bg: #eef0f3;
+      --toggle-active-bg: #1a1a1a;
+      --toggle-active-fg: #ffffff;
+      --flash: #fff4c2;
+      --error: #b91c1c;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      font-size: 18px;
+      line-height: 1.4;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin: 8px 0 16px;
+    }
+
+    .status {
+      font-size: 14px;
+      color: var(--muted);
+      margin: 0 0 16px;
+      min-height: 1.4em;
+    }
+    .status.error { color: var(--error); }
+
+    /* --- Section blocks --- */
+    .section {
+      margin: 0 0 20px;
+    }
+    .section-label {
+      display: block;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin: 0 0 8px;
+    }
+
+    /* --- Preset buttons --- */
+    .presets {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    .preset-btn {
+      min-height: 48px;
+      padding: 0 4px;
+      font: inherit;
+      font-weight: 600;
+      font-size: 16px;
+      background: var(--toggle-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .preset-btn:hover { background: #e6e9ee; }
+    .preset-btn:active { transform: translateY(1px); }
+
+    /* --- Toggle groups (Heavy/Light, g/oz) --- */
+    .toggles-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .toggle-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 160px;
+    }
+    .toggle {
+      display: inline-flex;
+      background: var(--toggle-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      padding: 3px;
+      gap: 3px;
+    }
+    .toggle button {
+      flex: 1;
+      min-height: 44px;
+      padding: 0 16px;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      background: transparent;
+      color: var(--fg);
+      border: 0;
+      border-radius: 7px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .toggle button[aria-pressed="true"] {
+      background: var(--toggle-active-bg);
+      color: var(--toggle-active-fg);
+    }
+
+    /* --- Ingredients table --- */
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    table.ingredients {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    .ingredients th, .ingredients td {
+      text-align: left;
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .ingredients thead th {
+      background: #f1f3f5;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .ingredients tbody tr:last-child td { border-bottom: 0; }
+    .ingredients tbody tr.total-row td {
+      background: #f7f8fa;
+      font-weight: 600;
+      border-top: 2px solid var(--border);
+    }
+    .ingredients td.name { font-weight: 600; }
+    .ingredients td.factor {
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .ingredients td.input-cell {
+      position: relative;
+      padding: 6px 10px;
+    }
+    .ingredients td.unit {
+      width: 36px;
+      color: var(--muted);
+      font-size: 15px;
+      text-align: left;
+      padding-left: 0;
+    }
+
+    /* column widths */
+    .col-name   { width: 38%; }
+    .col-factor { width: 22%; }
+    .col-input  { width: auto; }
+    .col-unit   { width: 44px; }
+
+    input.weight {
+      width: 100%;
+      min-height: 44px;
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 20px;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    input.weight::-webkit-outer-spin-button,
+    input.weight::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input.weight:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    /* anchor row */
+    tr.anchor td.input-cell input.weight {
+      border-color: var(--accent);
+      background: #f4f8ff;
+    }
+    tr.anchor td.name::before {
+      content: "⚓ ";
+      color: var(--accent);
+      font-size: 0.9em;
+    }
+
+    /* flash animation when a row's displayed value changes from a toggle */
+    @keyframes rowFlash {
+      0%   { background-color: var(--flash); }
+      100% { background-color: transparent; }
+    }
+    tr.flash td { animation: rowFlash 450ms ease-out; }
+    tr.flash.total-row td {
+      animation: rowFlash 450ms ease-out;
+      background-color: var(--flash);
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 520px) {
+      h1 { font-size: 24px; }
+      .presets { grid-template-columns: repeat(3, 1fr); }
+      .col-name   { width: 36%; }
+      .col-factor { width: 22%; }
+      .col-unit   { width: 32px; }
+      .ingredients td.factor { font-size: 12px; }
+      .ingredients th, .ingredients td { padding: 8px 6px; }
+      input.weight { font-size: 18px; }
+      .toggle button { padding: 0 12px; font-size: 15px; }
+    }
+
+    @media (max-width: 380px) {
+      .ingredients td.factor { display: none; }
+      .ingredients th.col-factor { display: none; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Soap Calculator</h1>
-  <p>The server is running. The calculator UI has not been built yet — this is a placeholder used to verify that the server, persistence, and config layers are wired up correctly.</p>
+  <main>
+    <h1>Soap Calculator</h1>
+    <p id="status" class="status">Loading factors&hellip;</p>
 
-  <h2>Current factors</h2>
-  <p id="status">Loading from <code>/api/data</code>&hellip;</p>
-  <pre id="factors"></pre>
+    <section class="section" aria-labelledby="presets-label">
+      <span id="presets-label" class="section-label">Lard presets</span>
+      <div class="presets" role="group" aria-label="Lard presets">
+        <button type="button" class="preset-btn" data-preset="205">205 g</button>
+        <button type="button" class="preset-btn" data-preset="410">410 g</button>
+        <button type="button" class="preset-btn" data-preset="615">615 g</button>
+        <button type="button" class="preset-btn" data-preset="820">820 g</button>
+        <button type="button" class="preset-btn" data-preset="1025">1025 g</button>
+        <button type="button" class="preset-btn" data-preset="1230">1230 g</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="toggles-row">
+        <div class="toggle-group">
+          <span class="section-label">Essential oil</span>
+          <div class="toggle" role="group" aria-label="Essential oil weight">
+            <button type="button" data-eo-btn="heavy" aria-pressed="true">Heavy</button>
+            <button type="button" data-eo-btn="light" aria-pressed="false">Light</button>
+          </div>
+        </div>
+
+        <div class="toggle-group">
+          <span class="section-label">Display unit</span>
+          <div class="toggle" role="group" aria-label="Display unit">
+            <button type="button" data-unit-btn="g" aria-pressed="true">g</button>
+            <button type="button" data-unit-btn="oz" aria-pressed="false">oz</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="Ingredients">
+      <div class="table-wrap">
+        <table class="ingredients">
+          <thead>
+            <tr>
+              <th class="col-name">Ingredient</th>
+              <th class="col-factor">Factor</th>
+              <th class="col-input">Weight</th>
+              <th class="col-unit" aria-label="Unit"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-row="lard">
+              <td class="name">Lard</td>
+              <td class="factor" data-factor="lard"></td>
+              <td class="input-cell"><input class="weight" data-field="lard" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
+              <td class="unit" data-unit-suffix>g</td>
+            </tr>
+            <tr data-row="coconut_oil">
+              <td class="name">Coconut Oil</td>
+              <td class="factor" data-factor="coconut_oil"></td>
+              <td class="input-cell"><input class="weight" data-field="coconut_oil" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
+              <td class="unit" data-unit-suffix>g</td>
+            </tr>
+            <tr data-row="lye">
+              <td class="name">Lye</td>
+              <td class="factor" data-factor="lye"></td>
+              <td class="input-cell"><input class="weight" data-field="lye" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
+              <td class="unit" data-unit-suffix>g</td>
+            </tr>
+            <tr data-row="water">
+              <td class="name">Water</td>
+              <td class="factor" data-factor="water"></td>
+              <td class="input-cell"><input class="weight" data-field="water" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
+              <td class="unit" data-unit-suffix>g</td>
+            </tr>
+            <tr data-row="essential_oil">
+              <td class="name">Essential Oil</td>
+              <td class="factor" data-factor="essential_oil"></td>
+              <td class="input-cell"><input class="weight" data-field="essential_oil" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
+              <td class="unit" data-unit-suffix>g</td>
+            </tr>
+            <tr data-row="total" class="total-row">
+              <td class="name">Total</td>
+              <td class="factor" data-factor="total"></td>
+              <td class="input-cell"><input class="weight" data-field="total" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
+              <td class="unit" data-unit-suffix>g</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 
   <script>
-    (function () {
-      var status = document.getElementById('status');
-      var factors = document.getElementById('factors');
+    'use strict';
 
+    var G_PER_OZ = 28.3495231;
+    var FIELDS = ['lard', 'coconut_oil', 'lye', 'water', 'essential_oil', 'total'];
+
+    var state = {
+      factors: null,
+      eoType: 'heavy',
+      unit: 'g',
+      anchorField: 'lard',
+      anchorWeightG: null
+    };
+
+    var statusEl = document.getElementById('status');
+
+    function activeEoFactor() {
+      return state.eoType === 'heavy'
+        ? state.factors.essential_oil_heavy
+        : state.factors.essential_oil_light;
+    }
+
+    function fieldFactor(field) {
+      var f = state.factors;
+      if (field === 'lard') return f.lard;
+      if (field === 'coconut_oil') return f.coconut_oil;
+      if (field === 'lye') return f.lye;
+      if (field === 'water') return f.water;
+      if (field === 'essential_oil') return activeEoFactor();
+      if (field === 'total') {
+        return f.lard + f.coconut_oil + f.lye + f.water + activeEoFactor();
+      }
+      throw new Error('unknown field: ' + field);
+    }
+
+    function weightForField(field) {
+      if (state.anchorWeightG == null || state.anchorField == null) return null;
+      var lardG = state.anchorWeightG / fieldFactor(state.anchorField);
+      return lardG * fieldFactor(field);
+    }
+
+    function formatWeight(g) {
+      if (g == null) return '';
+      var v = state.unit === 'g' ? g : g / G_PER_OZ;
+      return v.toFixed(2);
+    }
+
+    function formatFactor(n) {
+      var s = n.toPrecision(8);
+      if (s.indexOf('.') !== -1 && s.indexOf('e') === -1) {
+        s = s.replace(/0+$/, '').replace(/\.$/, '');
+      }
+      return s;
+    }
+
+    function $field(field) {
+      return document.querySelector('input[data-field="' + field + '"]');
+    }
+    function $row(field) {
+      return document.querySelector('tr[data-row="' + field + '"]');
+    }
+
+    function renderFactorCells() {
+      FIELDS.forEach(function (field) {
+        var cell = document.querySelector('[data-factor="' + field + '"]');
+        if (cell) cell.textContent = formatFactor(fieldFactor(field));
+      });
+    }
+
+    function renderAnchorClass() {
+      FIELDS.forEach(function (field) {
+        var row = $row(field);
+        if (state.anchorField === field && state.anchorWeightG != null) {
+          row.classList.add('anchor');
+        } else {
+          row.classList.remove('anchor');
+        }
+      });
+    }
+
+    function renderAllInputs(skipField) {
+      FIELDS.forEach(function (field) {
+        if (field === skipField) return;
+        var input = $field(field);
+        var g = field === state.anchorField ? state.anchorWeightG : weightForField(field);
+        input.value = formatWeight(g);
+      });
+    }
+
+    function captureDisplay() {
+      var snap = {};
+      FIELDS.forEach(function (field) {
+        var g = field === state.anchorField ? state.anchorWeightG : weightForField(field);
+        snap[field] = formatWeight(g);
+      });
+      return snap;
+    }
+
+    function flashChangedRows(before) {
+      FIELDS.forEach(function (field) {
+        var after = formatWeight(field === state.anchorField ? state.anchorWeightG : weightForField(field));
+        if (after !== before[field]) {
+          var row = $row(field);
+          row.classList.remove('flash');
+          void row.offsetWidth;
+          row.classList.add('flash');
+        }
+      });
+    }
+
+    function clearAll() {
+      state.anchorField = 'lard';
+      state.anchorWeightG = null;
+      FIELDS.forEach(function (field) { $field(field).value = ''; });
+      renderAnchorClass();
+    }
+
+    function onInput(e) {
+      var field = e.target.dataset.field;
+      var raw = e.target.value.trim();
+      if (raw === '') {
+        if (field === state.anchorField) clearAll();
+        return;
+      }
+      var parsed = Number(raw);
+      if (!isFinite(parsed) || parsed <= 0) {
+        return;
+      }
+      var grams = state.unit === 'g' ? parsed : parsed * G_PER_OZ;
+      state.anchorField = field;
+      state.anchorWeightG = grams;
+      renderAnchorClass();
+      renderAllInputs(field);
+    }
+
+    function onBlur(e) {
+      var field = e.target.dataset.field;
+      if (state.anchorWeightG == null) return;
+      var g = field === state.anchorField ? state.anchorWeightG : weightForField(field);
+      e.target.value = formatWeight(g);
+    }
+
+    function applyPreset(grams) {
+      state.anchorField = 'lard';
+      state.anchorWeightG = grams;
+      renderAnchorClass();
+      FIELDS.forEach(function (field) {
+        $field(field).value = formatWeight(field === 'lard' ? grams : weightForField(field));
+      });
+    }
+
+    function setEoType(type) {
+      if (state.eoType === type) return;
+      var before = captureDisplay();
+      state.eoType = type;
+      document.querySelectorAll('[data-eo-btn]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.dataset.eoBtn === type ? 'true' : 'false');
+      });
+      renderFactorCells();
+      if (state.anchorWeightG != null) {
+        renderAllInputs(state.anchorField);
+        flashChangedRows(before);
+      }
+    }
+
+    function setUnit(unit) {
+      if (state.unit === unit) return;
+      state.unit = unit;
+      document.querySelectorAll('[data-unit-btn]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.dataset.unitBtn === unit ? 'true' : 'false');
+      });
+      document.querySelectorAll('[data-unit-suffix]').forEach(function (s) {
+        s.textContent = unit;
+      });
+      if (state.anchorWeightG != null) {
+        FIELDS.forEach(function (field) {
+          var g = field === state.anchorField ? state.anchorWeightG : weightForField(field);
+          $field(field).value = formatWeight(g);
+        });
+      }
+    }
+
+    function wireEvents() {
+      document.querySelectorAll('input[data-field]').forEach(function (i) {
+        i.addEventListener('input', onInput);
+        i.addEventListener('blur', onBlur);
+      });
+      document.querySelectorAll('[data-preset]').forEach(function (b) {
+        b.addEventListener('click', function () { applyPreset(Number(b.dataset.preset)); });
+      });
+      document.querySelectorAll('[data-eo-btn]').forEach(function (b) {
+        b.addEventListener('click', function () { setEoType(b.dataset.eoBtn); });
+      });
+      document.querySelectorAll('[data-unit-btn]').forEach(function (b) {
+        b.addEventListener('click', function () { setUnit(b.dataset.unitBtn); });
+      });
+    }
+
+    function init() {
       fetch('/api/data', { headers: { 'Accept': 'application/json' } })
-        .then(function (res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.json();
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
         })
         .then(function (data) {
           var set = data && data.factor_sets && data.factor_sets.default;
           if (!set) throw new Error('no default factor set in data');
-          status.textContent = 'Loaded default factor set from /api/data.';
-          factors.textContent = JSON.stringify(set, null, 2);
+          state.factors = set;
+          if (data.settings && data.settings.default_eo_type) {
+            state.eoType = data.settings.default_eo_type;
+          }
+          if (data.settings && data.settings.default_unit) {
+            state.unit = data.settings.default_unit;
+          }
+          document.querySelectorAll('[data-eo-btn]').forEach(function (b) {
+            b.setAttribute('aria-pressed', b.dataset.eoBtn === state.eoType ? 'true' : 'false');
+          });
+          document.querySelectorAll('[data-unit-btn]').forEach(function (b) {
+            b.setAttribute('aria-pressed', b.dataset.unitBtn === state.unit ? 'true' : 'false');
+          });
+          document.querySelectorAll('[data-unit-suffix]').forEach(function (s) {
+            s.textContent = state.unit;
+          });
+          renderFactorCells();
+          renderAnchorClass();
+          wireEvents();
+          statusEl.textContent = '';
         })
         .catch(function (err) {
-          status.textContent = 'Failed to load /api/data: ' + err.message;
+          statusEl.className = 'status error';
+          statusEl.textContent = 'Failed to load /api/data: ' + err.message;
         });
-    })();
+    }
+
+    init();
   </script>
 </body>
 </html>
