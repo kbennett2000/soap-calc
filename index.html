@@ -280,6 +280,66 @@
       background-color: var(--flash);
     }
 
+    /* --- Measuring mode --- */
+    .col-check { width: 48px; }
+    th.col-check, td.check-cell { display: none; }
+    body.measuring th.col-check,
+    body.measuring td.check-cell { display: table-cell; }
+    td.check-cell {
+      padding: 0;
+      text-align: center;
+    }
+    .check-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+      cursor: pointer;
+      margin: 2px;
+      border-radius: 8px;
+    }
+    .check-label:hover { background: var(--toggle-bg); }
+    .check-label input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
+    .measuring-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .measuring-controls .btn { min-width: 140px; }
+
+    /* In measuring mode, hide the preset row, neutralize the anchor visuals,
+       lock the inputs visually, and apply strikethrough to checked rows. */
+    body.measuring .presets-section { display: none; }
+    body.measuring tr.anchor td.name::before { content: none; }
+    body.measuring tr.anchor td.input-cell input.weight {
+      border-color: var(--border);
+      background: #f7f8fa;
+    }
+    body.measuring input.weight {
+      background: #f7f8fa;
+      cursor: default;
+      caret-color: transparent;
+    }
+    body.measuring tr.checked td.name,
+    body.measuring tr.checked td.factor,
+    body.measuring tr.checked td.unit {
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      color: var(--muted);
+    }
+    body.measuring tr.checked input.weight {
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      color: var(--muted);
+    }
+
     /* --- Settings view --- */
     .settings-form {
       display: grid;
@@ -395,7 +455,7 @@
       </div>
       <p id="status" class="status">Loading factors&hellip;</p>
 
-      <section class="section" aria-labelledby="presets-label">
+      <section class="section presets-section" aria-labelledby="presets-label">
         <span id="presets-label" class="section-label">Lard presets</span>
         <div class="presets" role="group" aria-label="Lard presets">
           <button type="button" class="preset-btn" data-preset="205">205 g</button>
@@ -427,11 +487,18 @@
         </div>
       </section>
 
+      <section class="section measuring-controls">
+        <button type="button" class="btn" data-start-measuring>Start measuring</button>
+        <button type="button" class="btn" data-reset-checks hidden>Reset</button>
+        <button type="button" class="btn btn-primary" data-done-measuring hidden>Done</button>
+      </section>
+
       <section class="section" aria-label="Ingredients">
         <div class="table-wrap">
           <table class="ingredients">
             <thead>
               <tr>
+                <th class="col-check" aria-label="Measured"></th>
                 <th class="col-name">Ingredient</th>
                 <th class="col-factor">Factor</th>
                 <th class="col-input">Weight</th>
@@ -440,36 +507,42 @@
             </thead>
             <tbody>
               <tr data-row="lard">
+                <td class="check-cell"><label class="check-label"><input type="checkbox" data-check="lard" aria-label="Measured: Lard"></label></td>
                 <td class="name">Lard</td>
                 <td class="factor" data-factor="lard"></td>
                 <td class="input-cell"><input class="weight" data-field="lard" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
                 <td class="unit" data-unit-suffix>g</td>
               </tr>
               <tr data-row="coconut_oil">
+                <td class="check-cell"><label class="check-label"><input type="checkbox" data-check="coconut_oil" aria-label="Measured: Coconut Oil"></label></td>
                 <td class="name">Coconut Oil</td>
                 <td class="factor" data-factor="coconut_oil"></td>
                 <td class="input-cell"><input class="weight" data-field="coconut_oil" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
                 <td class="unit" data-unit-suffix>g</td>
               </tr>
               <tr data-row="lye">
+                <td class="check-cell"><label class="check-label"><input type="checkbox" data-check="lye" aria-label="Measured: Lye"></label></td>
                 <td class="name">Lye</td>
                 <td class="factor" data-factor="lye"></td>
                 <td class="input-cell"><input class="weight" data-field="lye" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
                 <td class="unit" data-unit-suffix>g</td>
               </tr>
               <tr data-row="water">
+                <td class="check-cell"><label class="check-label"><input type="checkbox" data-check="water" aria-label="Measured: Water"></label></td>
                 <td class="name">Water</td>
                 <td class="factor" data-factor="water"></td>
                 <td class="input-cell"><input class="weight" data-field="water" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
                 <td class="unit" data-unit-suffix>g</td>
               </tr>
               <tr data-row="essential_oil">
+                <td class="check-cell"><label class="check-label"><input type="checkbox" data-check="essential_oil" aria-label="Measured: Essential Oil"></label></td>
                 <td class="name">Essential Oil</td>
                 <td class="factor" data-factor="essential_oil"></td>
                 <td class="input-cell"><input class="weight" data-field="essential_oil" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
                 <td class="unit" data-unit-suffix>g</td>
               </tr>
               <tr data-row="total" class="total-row">
+                <td class="check-cell"></td>
                 <td class="name">Total</td>
                 <td class="factor" data-factor="total"></td>
                 <td class="input-cell"><input class="weight" data-field="total" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
@@ -568,6 +641,8 @@
     };
     var DEFAULT_SETTINGS = { default_unit: 'g', default_eo_type: 'heavy' };
 
+    var INGREDIENT_FIELDS = ['lard', 'coconut_oil', 'lye', 'water', 'essential_oil'];
+
     var state = {
       data: null,
       factors: null,
@@ -575,7 +650,8 @@
       unit: 'g',
       anchorField: 'lard',
       anchorWeightG: null,
-      view: 'main'
+      view: 'main',
+      measuring: false
     };
 
     var statusEl = document.getElementById('status');
@@ -730,6 +806,8 @@
         renderAllInputs(state.anchorField);
         flashChangedRows(before);
       }
+      // §3.1.1: Heavy/Light change clears measuring checkboxes
+      if (state.measuring) clearAllChecks();
     }
 
     function setUnit(unit) {
@@ -906,6 +984,8 @@
             renderAllInputs(state.anchorField);
             flashChangedRows(beforeDisplay);
           }
+          // §3.1.1: factor change clears measuring checkboxes
+          if (state.measuring) clearAllChecks();
           if (!opts.silent) showToast('Factors updated');
         })
         .catch(function () { /* silent — try again on next visibility change */ });
@@ -915,6 +995,52 @@
       if (document.visibilityState === 'visible' && state.view === 'main') {
         refreshFactorsIfChanged();
       }
+    }
+
+    // ---- measuring mode (SPEC §3.1.1) ----
+
+    function setCheckboxState(field, checked) {
+      var cb = document.querySelector('input[data-check="' + field + '"]');
+      if (cb) cb.checked = checked;
+      var row = $row(field);
+      if (!row) return;
+      if (checked) row.classList.add('checked');
+      else row.classList.remove('checked');
+    }
+
+    function clearAllChecks() {
+      INGREDIENT_FIELDS.forEach(function (field) {
+        setCheckboxState(field, false);
+      });
+    }
+
+    function onCheckboxToggle(e) {
+      var field = e.target.dataset.check;
+      setCheckboxState(field, e.target.checked);
+    }
+
+    function enterMeasuring() {
+      state.measuring = true;
+      document.body.classList.add('measuring');
+      FIELDS.forEach(function (field) {
+        $field(field).setAttribute('readonly', '');
+      });
+      clearAllChecks();
+      document.querySelector('[data-start-measuring]').hidden = true;
+      document.querySelector('[data-reset-checks]').hidden = false;
+      document.querySelector('[data-done-measuring]').hidden = false;
+    }
+
+    function exitMeasuring() {
+      state.measuring = false;
+      document.body.classList.remove('measuring');
+      FIELDS.forEach(function (field) {
+        $field(field).removeAttribute('readonly');
+      });
+      clearAllChecks();
+      document.querySelector('[data-start-measuring]').hidden = false;
+      document.querySelector('[data-reset-checks]').hidden = true;
+      document.querySelector('[data-done-measuring]').hidden = true;
     }
 
     // ---- wiring ----
@@ -953,6 +1079,12 @@
       document.querySelector('[data-settings-reset]').addEventListener('click', settingsReset);
       document.querySelector('[data-settings-cancel]').addEventListener('click', settingsCancel);
       document.querySelector('[data-settings-save]').addEventListener('click', settingsSave);
+      document.querySelector('[data-start-measuring]').addEventListener('click', enterMeasuring);
+      document.querySelector('[data-done-measuring]').addEventListener('click', exitMeasuring);
+      document.querySelector('[data-reset-checks]').addEventListener('click', clearAllChecks);
+      document.querySelectorAll('input[data-check]').forEach(function (cb) {
+        cb.addEventListener('change', onCheckboxToggle);
+      });
       document.addEventListener('visibilitychange', onVisibilityChange);
     }
 
