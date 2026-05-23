@@ -620,6 +620,168 @@
       .ingredients td.factor { display: none; }
       .ingredients th.col-factor { display: none; }
     }
+
+    /* --- Print-only elements (hidden on screen) --- */
+    .print-only { display: none; }
+
+    /* --- Print styles --- */
+    @media print {
+      html, body {
+        background: #fff !important;
+        color: #000 !important;
+        font-size: 12pt;
+      }
+      main { max-width: none; padding: 0; }
+
+      /* Hide all app chrome */
+      .view-header,
+      .presets-section,
+      .recipe-action-bar,
+      .toggles-row,
+      #status,
+      .measuring-controls,
+      .toast,
+      .modal-backdrop,
+      #settings-view,
+      th.col-check,
+      td.check-cell {
+        display: none !important;
+      }
+
+      /* Reveal print-only blocks */
+      .print-only { display: block !important; }
+      th.print-only, td.print-only { display: table-cell !important; }
+
+      /* Print header */
+      .print-header { margin: 0 0 18pt 0; }
+      .print-title {
+        font-size: 24pt;
+        font-weight: 600;
+        margin: 0 0 6pt 0;
+        color: #000;
+        letter-spacing: -0.01em;
+      }
+      .print-meta {
+        font-size: 11pt;
+        color: #000;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6pt 24pt;
+      }
+      .print-date::before { content: "Printed "; color: #444; }
+
+      /* Neutralize table chrome */
+      .table-wrap {
+        border: 1pt solid #000;
+        border-radius: 0;
+        overflow: visible;
+      }
+      table.ingredients {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: auto;
+      }
+      .ingredients th, .ingredients td {
+        border-bottom: 0.5pt solid #888;
+        padding: 6pt 8pt;
+        background: #fff !important;
+        color: #000 !important;
+        font-size: 12pt;
+        vertical-align: middle;
+      }
+      .ingredients thead th {
+        background: #ececec !important;
+        font-size: 10pt;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 700;
+        color: #000 !important;
+        border-bottom: 1pt solid #000;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .ingredients tbody tr.total-row td {
+        background: #ececec !important;
+        font-weight: 700;
+        border-top: 1pt solid #000;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .ingredients td.name { font-weight: 600; }
+      .ingredients td.factor { font-size: 11pt; color: #333 !important; }
+
+      /* Inputs render as plain text values */
+      input.weight {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        text-align: right;
+        padding: 0;
+        margin: 0;
+        color: #000 !important;
+        font-size: 12pt;
+        font-weight: 600;
+        min-height: 0;
+        height: auto;
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+      }
+
+      /* Strip anchor highlighting + strikethrough in print */
+      tr.anchor td.name::before { content: none !important; }
+      tr.anchor td.input-cell input.weight,
+      tr.anchor td.input-cell {
+        border-color: #888 !important;
+        background: #fff !important;
+      }
+      tr.checked td.name,
+      tr.checked input.weight,
+      tr.checked td.factor,
+      tr.checked td.unit {
+        text-decoration: none !important;
+        color: #000 !important;
+      }
+
+      /* Measured column */
+      th.col-measured {
+        width: 80pt;
+        text-align: center;
+      }
+      td.measured-cell {
+        text-align: center;
+        padding: 8pt !important;
+      }
+      .measured-box {
+        display: inline-block;
+        width: 14pt;
+        height: 14pt;
+        border: 1.5pt solid #000;
+        background: #fff;
+        vertical-align: middle;
+      }
+
+      /* Notes section */
+      .print-notes-section { margin-top: 18pt; page-break-inside: avoid; }
+      .print-section-label {
+        font-size: 13pt;
+        margin: 0 0 6pt 0;
+        font-weight: 600;
+        color: #000;
+      }
+      .print-notes-content {
+        white-space: pre-wrap;
+        min-height: 70pt;
+        border: 0.5pt solid #888;
+        padding: 8pt 10pt;
+        font-size: 11pt;
+        color: #000;
+        line-height: 1.5;
+      }
+
+      /* Ensure the whole printout stays on one page when possible */
+      .table-wrap, .print-header { page-break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
@@ -681,8 +843,18 @@
         <div class="recipe-action-bar" role="group" aria-label="Recipe actions">
           <button type="button" class="btn" data-save-recipe disabled>Save Recipe</button>
           <button type="button" class="btn" data-load-recipe>Load Recipe</button>
+          <button type="button" class="btn" data-print-recipe disabled>Print</button>
         </div>
       </section>
+
+      <!-- Print-only header (hidden on screen, revealed via @media print). -->
+      <div class="print-only print-header">
+        <h1 id="print-title" class="print-title"></h1>
+        <div class="print-meta">
+          <span id="print-date" class="print-date"></span>
+          <span id="print-eo" class="print-eo"></span>
+        </div>
+      </div>
 
       <section class="section">
         <div class="toggles-row">
@@ -720,6 +892,7 @@
                 <th class="col-factor">Factor</th>
                 <th class="col-input">Weight</th>
                 <th class="col-unit" aria-label="Unit"></th>
+                <th class="col-measured print-only">Measured</th>
               </tr>
             </thead>
             <tbody>
@@ -729,6 +902,7 @@
                 <td class="factor" data-factor="lard"></td>
                 <td class="input-cell"><input class="weight" data-field="lard" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
                 <td class="unit" data-unit-suffix>g</td>
+                <td class="measured-cell print-only"><span class="measured-box"></span></td>
               </tr>
               <tr data-row="coconut_oil">
                 <td class="check-cell"><label class="check-label"><input type="checkbox" data-check="coconut_oil" aria-label="Measured: Coconut Oil"></label></td>
@@ -736,6 +910,7 @@
                 <td class="factor" data-factor="coconut_oil"></td>
                 <td class="input-cell"><input class="weight" data-field="coconut_oil" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
                 <td class="unit" data-unit-suffix>g</td>
+                <td class="measured-cell print-only"><span class="measured-box"></span></td>
               </tr>
               <tr data-row="lye">
                 <td class="check-cell"><label class="check-label"><input type="checkbox" data-check="lye" aria-label="Measured: Lye"></label></td>
@@ -743,6 +918,7 @@
                 <td class="factor" data-factor="lye"></td>
                 <td class="input-cell"><input class="weight" data-field="lye" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
                 <td class="unit" data-unit-suffix>g</td>
+                <td class="measured-cell print-only"><span class="measured-box"></span></td>
               </tr>
               <tr data-row="water">
                 <td class="check-cell"><label class="check-label"><input type="checkbox" data-check="water" aria-label="Measured: Water"></label></td>
@@ -750,6 +926,7 @@
                 <td class="factor" data-factor="water"></td>
                 <td class="input-cell"><input class="weight" data-field="water" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
                 <td class="unit" data-unit-suffix>g</td>
+                <td class="measured-cell print-only"><span class="measured-box"></span></td>
               </tr>
               <tr data-row="essential_oil">
                 <td class="check-cell"><label class="check-label"><input type="checkbox" data-check="essential_oil" aria-label="Measured: Essential Oil"></label></td>
@@ -757,6 +934,7 @@
                 <td class="factor" data-factor="essential_oil"></td>
                 <td class="input-cell"><input class="weight" data-field="essential_oil" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
                 <td class="unit" data-unit-suffix>g</td>
+                <td class="measured-cell print-only"><span class="measured-box"></span></td>
               </tr>
               <tr data-row="total" class="total-row">
                 <td class="check-cell"></td>
@@ -764,10 +942,17 @@
                 <td class="factor" data-factor="total"></td>
                 <td class="input-cell"><input class="weight" data-field="total" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done"></td>
                 <td class="unit" data-unit-suffix>g</td>
+                <td class="measured-cell print-only"></td>
               </tr>
             </tbody>
           </table>
         </div>
+      </section>
+
+      <!-- Print-only notes section (revealed via @media print). -->
+      <section class="print-only print-notes-section">
+        <h2 class="print-section-label">Notes</h2>
+        <div id="print-notes-content" class="print-notes-content"></div>
       </section>
     </section>
 
@@ -868,7 +1053,8 @@
       anchorField: 'lard',
       anchorWeightG: null,
       view: 'main',
-      measuring: false
+      measuring: false,
+      loadedRecipeId: null
     };
 
     var statusEl = document.getElementById('status');
@@ -975,9 +1161,11 @@
     function clearAll() {
       state.anchorField = 'lard';
       state.anchorWeightG = null;
+      state.loadedRecipeId = null;
       FIELDS.forEach(function (field) { $field(field).value = ''; });
       renderAnchorClass();
       updateSaveRecipeEnabled();
+      updatePrintEnabled();
     }
 
     function onInput(e) {
@@ -992,9 +1180,11 @@
       var grams = state.unit === 'g' ? parsed : parsed * G_PER_OZ;
       state.anchorField = field;
       state.anchorWeightG = grams;
+      state.loadedRecipeId = null;
       renderAnchorClass();
       renderAllInputs(field);
       updateSaveRecipeEnabled();
+      updatePrintEnabled();
     }
 
     function onBlur(e) {
@@ -1007,17 +1197,20 @@
     function applyPreset(grams) {
       state.anchorField = 'lard';
       state.anchorWeightG = grams;
+      state.loadedRecipeId = null;
       renderAnchorClass();
       FIELDS.forEach(function (field) {
         $field(field).value = formatWeight(field === 'lard' ? grams : weightForField(field));
       });
       updateSaveRecipeEnabled();
+      updatePrintEnabled();
     }
 
     function setEoType(type) {
       if (state.eoType === type) return;
       var before = captureDisplay();
       state.eoType = type;
+      state.loadedRecipeId = null;
       document.querySelectorAll('[data-eo-btn]').forEach(function (b) {
         b.setAttribute('aria-pressed', b.dataset.eoBtn === type ? 'true' : 'false');
       });
@@ -1274,6 +1467,42 @@
       if (btn) btn.disabled = (state.anchorWeightG == null);
     }
 
+    function updatePrintEnabled() {
+      var btn = document.querySelector('[data-print-recipe]');
+      if (btn) btn.disabled = (state.anchorWeightG == null);
+    }
+
+    function currentLoadedRecipe() {
+      if (!state.loadedRecipeId) return null;
+      return ((state.data && state.data.recipes) || []).find(function (r) {
+        return r.id === state.loadedRecipeId;
+      }) || null;
+    }
+
+    function formatPrintDate(d) {
+      try {
+        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch (e) {
+        return d.toISOString().slice(0, 10);
+      }
+    }
+
+    function preparePrint() {
+      var loaded = currentLoadedRecipe();
+      document.getElementById('print-title').textContent = (loaded && loaded.name) || 'Soap Recipe';
+      document.getElementById('print-date').textContent = formatPrintDate(new Date());
+      document.getElementById('print-eo').textContent =
+        'Essential Oil: ' + (state.eoType === 'heavy' ? 'Heavy' : 'Light');
+      document.getElementById('print-notes-content').textContent =
+        (loaded && loaded.notes) ? loaded.notes : '';
+    }
+
+    function doPrint() {
+      if (state.anchorWeightG == null) return;
+      preparePrint();
+      window.print();
+    }
+
     function genRecipeId() {
       return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
     }
@@ -1362,9 +1591,11 @@
         return r.json();
       }).then(function () {
         state.data = newData;
+        state.loadedRecipeId = recipe.id;
         confirmBtn.disabled = false;
         closeSaveModal();
         showToast('Recipe saved');
+        updatePrintEnabled();
       }).catch(function (err) {
         confirmBtn.disabled = false;
         errorEl.textContent = 'Save failed: ' + err.message;
@@ -1558,6 +1789,7 @@
 
       state.anchorField = recipe.anchor_field;
       state.anchorWeightG = recipe.anchor_value_g;
+      state.loadedRecipeId = recipe.id;
       if (recipe.eo_type && recipe.eo_type !== state.eoType) {
         state.eoType = recipe.eo_type;
         document.querySelectorAll('[data-eo-btn]').forEach(function (b) {
@@ -1572,6 +1804,7 @@
         $field(field).value = formatWeight(g);
       });
       updateSaveRecipeEnabled();
+      updatePrintEnabled();
       closeLoadModal();
       showToast('Loaded: ' + recipe.name);
     }
@@ -1620,6 +1853,7 @@
       });
       document.querySelector('[data-save-recipe]').addEventListener('click', openSaveModal);
       document.querySelector('[data-load-recipe]').addEventListener('click', openLoadModal);
+      document.querySelector('[data-print-recipe]').addEventListener('click', doPrint);
       document.querySelector('[data-save-modal-cancel]').addEventListener('click', closeSaveModal);
       document.querySelector('[data-save-modal-confirm]').addEventListener('click', saveRecipeFromModal);
       document.querySelector('[data-load-modal-close]').addEventListener('click', closeLoadModal);
@@ -1649,6 +1883,7 @@
       renderFactorCells();
       renderAnchorClass();
       updateSaveRecipeEnabled();
+      updatePrintEnabled();
     }
 
     function init() {
