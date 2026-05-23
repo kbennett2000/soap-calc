@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "factor_sets": {
+    "default": {
+      "lard": 1.0,
+      "coconut_oil": 0.2512195122,
+      "lye": 0.1731707317,
+      "water": 0.4756097561,
+      "essential_oil_heavy": 0.06097560975609760,
+      "essential_oil_light": 0.03658536585
+    }
+  },
+  "settings": {
+    "default_unit": "g",
+    "default_eo_type": "heavy"
+  },
+  "recipes": []
+}

@@ -1,0 +1,13 @@
+# soapcalc runtime configuration.
+# Copy to /etc/soapcalc.conf (mode 644) and edit as needed.
+# Format: KEY=VALUE, one per line. Loaded by systemd via EnvironmentFile.
+
+# TCP port to listen on.
+PORT=8030
+
+# Path to the JSON data file. Must be writable by the soapcalc user.
+DATA_FILE=/var/lib/soapcalc/data.json
+
+# Interface to bind. Use 0.0.0.0 for all interfaces, or a specific LAN IP to
+# restrict access (e.g. 192.168.1.10).
+BIND_ADDRESS=0.0.0.0

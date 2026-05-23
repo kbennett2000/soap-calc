@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Soap Calculator</title>
+</head>
+<body>
+  <h1>Soap Calculator</h1>
+  <p>The server is running. The calculator UI has not been built yet — this is a placeholder used to verify that the server, persistence, and config layers are wired up correctly.</p>
+
+  <h2>Current factors</h2>
+  <p id="status">Loading from <code>/api/data</code>&hellip;</p>
+  <pre id="factors"></pre>
+
+  <script>
+    (function () {
+      var status = document.getElementById('status');
+      var factors = document.getElementById('factors');
+
+      fetch('/api/data', { headers: { 'Accept': 'application/json' } })
+        .then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          var set = data && data.factor_sets && data.factor_sets.default;
+          if (!set) throw new Error('no default factor set in data');
+          status.textContent = 'Loaded default factor set from /api/data.';
+          factors.textContent = JSON.stringify(set, null, 2);
+        })
+        .catch(function (err) {
+          status.textContent = 'Failed to load /api/data: ' + err.message;
+        });
+    })();
+  </script>
+</body>
+</html>

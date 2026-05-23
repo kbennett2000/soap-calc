@@ -1,0 +1,38 @@
+[Unit]
+Description=Soap Calculator (LAN-only recipe scaler)
+Documentation=https://github.com/kbennett2000/soap-calc
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=soapcalc
+Group=soapcalc
+EnvironmentFile=/etc/soapcalc.conf
+ExecStart=/usr/bin/node /opt/soapcalc/server.js
+WorkingDirectory=/opt/soapcalc
+Restart=always
+RestartSec=5
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictRealtime=true
+ReadWritePaths=/var/lib/soapcalc
+
+# Standard output goes to the systemd journal.
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
