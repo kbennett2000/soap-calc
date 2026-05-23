@@ -82,6 +82,38 @@ The primary screen. Contains:
 - Buttons: **Save Recipe**, **Load Recipe**, **Print**, **Settings**
 - Large, readable typography — designed to be readable on a phone propped on a workbench, possibly with soapy hands
 
+### 3.1.1 Measuring mode
+
+A toggle-on mode for working through a finalized recipe at the counter. Reached
+via a "Start measuring" button on the main calculator view, near the unit toggle.
+
+**While active:**
+
+- All weight input fields become read-only
+- A checkbox column appears at the left of each ingredient row
+- Tapping a checkbox toggles a strikethrough on the ingredient name and weight
+  (rows remain legible — strikethrough only, no dimming)
+- The preset buttons and the anchor indicator are hidden (not relevant while
+  measuring)
+- The "Start measuring" button is replaced with "Done"
+- The g/oz unit toggle remains available and does NOT clear checkboxes (the
+  recipe is unchanged, only the display)
+- A "Reset" button is visible, clears all checkboxes without exiting the mode
+
+**Exiting the mode** (via "Done") clears all checkboxes.
+
+**Auto-clear:** checkboxes are cleared if any of the following occur (these
+shouldn't be reachable while inputs are locked, but the rules are defensive):
+
+- Any weight input changes
+- The anchor field changes
+- The Heavy/Light toggle changes
+- The active factor set changes (e.g., from another device editing settings)
+
+**Persistence:** checkbox state is in-memory only. A page refresh clears it.
+This is intentional — a measuring session is short (10–30 minutes) and
+cross-device persistence isn't worth the complexity.
+
 ### 3.2 Settings page
 
 Reachable from the main view, returns to it on save/cancel. Contains:
@@ -344,6 +376,7 @@ These are minor and can be decided during implementation:
 
 The build is complete when:
 
+- [ ] Measuring mode locks inputs, shows checkboxes, strikethrough toggles per row, exits on Done, auto-clears on recipe change
 - [ ] Typing a weight into any ingredient field instantly updates all other ingredients
 - [ ] Total row works as an anchor
 - [ ] Heavy/Light toggle correctly switches the EO factor and recomputes
