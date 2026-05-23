@@ -1,0 +1,26 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor folders/files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+
+# Atomic write temp files
+*.tmp
+
+# Node (defensive — project uses no npm dependencies)
+node_modules/
+
+# Local runtime artifacts (examples are tracked)
+data.json
+soapcalc.conf
