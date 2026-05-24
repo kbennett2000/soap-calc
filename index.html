@@ -567,6 +567,283 @@
       display: block;
     }
 
+    /* --- Modals: shared form helpers for batch flows (SPEC §10) --- */
+    .modal-field { margin-bottom: 14px; }
+    .modal-field:last-child { margin-bottom: 0; }
+    .modal-field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .modal-readonly-pill {
+      background: #f7f8fa;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 16px;
+      color: var(--muted);
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Ingredient summary table (Start a batch modal: read-only snapshot) */
+    .ingredient-summary {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .ingredient-summary table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+    .ingredient-summary td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .ingredient-summary tr:last-child td { border-bottom: 0; }
+    .ingredient-summary td.name { font-weight: 600; }
+    .ingredient-summary td.weight {
+      text-align: right;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      width: 110px;
+    }
+
+    /* Editable ingredient rows (New batch modal) */
+    .ingredient-row {
+      display: grid;
+      grid-template-columns: 1fr 110px 40px;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    .ingredient-row input.modal-input { min-height: 44px; font-size: 16px; }
+    .ingredient-row .ingredient-weight { text-align: right; font-variant-numeric: tabular-nums; }
+    .ingredient-row .ingredient-remove {
+      width: 40px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      touch-action: manipulation;
+    }
+    .ingredient-row .ingredient-remove:hover { background: var(--toggle-bg); }
+    .add-ingredient-btn {
+      background: transparent;
+      border: 1px dashed var(--border);
+      color: var(--accent);
+      width: 100%;
+      min-height: 44px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+      margin-top: 4px;
+      touch-action: manipulation;
+    }
+    .add-ingredient-btn:hover { background: var(--accent-soft); }
+
+    /* Advanced expander (cure-time override) */
+    .advanced-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent);
+      background: transparent;
+      border: 0;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 8px 0;
+      margin: 4px 0 8px;
+      min-height: 36px;
+    }
+    .advanced-toggle .caret { display: inline-block; width: 12px; }
+    .advanced-panel {
+      border-left: 3px solid var(--accent-soft);
+      padding: 12px 14px;
+      background: #fafbfc;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 12px;
+    }
+    .advanced-panel[hidden] { display: none; }
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      min-height: 28px;
+    }
+    .check-row input[type="checkbox"] { width: 18px; height: 18px; }
+    .check-row label { font-weight: 600; font-size: 15px; }
+    .override-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .override-row input[type="number"] {
+      width: 96px;
+      min-height: 40px;
+      padding: 6px 10px;
+      font: inherit;
+      font-size: 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    .override-row input[type="number"].invalid {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px var(--error-soft);
+    }
+    .override-row .hint { font-size: 14px; color: var(--muted); }
+    .btn-small { min-height: 40px; padding: 0 12px; font-size: 14px; }
+
+    /* Batches tab: empty state with the temporary New batch button */
+    .batches-empty .new-batch-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 24px;
+    }
+
+    /* Batch detail view (SPEC §10.5.3) */
+    .detail-back-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-back-bar .title {
+      flex: 1;
+      text-align: center;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .detail-back-bar .btn-link { padding: 0 6px; min-height: 40px; }
+    .detail-back-bar .spacer { width: 56px; }
+    .detail-header {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .detail-name-container {
+      flex: 1;
+      min-width: 0;
+    }
+    .detail-name {
+      font-size: 22px;
+      font-weight: 600;
+      word-break: break-word;
+      cursor: pointer;
+      padding: 4px 0;
+      display: inline-block;
+    }
+    .detail-name:hover { color: var(--accent); }
+    .detail-name-edit {
+      width: 100%;
+      font: inherit;
+      font-size: 22px;
+      font-weight: 600;
+      padding: 6px 10px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .detail-edit-pencil {
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      border: 0;
+      padding: 6px 8px;
+      min-height: 44px;
+    }
+    .detail-date {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 4px 0 12px;
+    }
+    .detail-progress-row {
+      margin: 8px 0;
+    }
+    .detail-progress-bar {
+      height: 8px;
+      background: var(--toggle-bg);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 0 0 8px;
+    }
+    .detail-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+    .detail-status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .detail-section {
+      margin: 18px 0;
+    }
+    .detail-section h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      font-weight: 700;
+      margin: 0 0 8px;
+    }
+    .detail-section textarea.modal-input { min-height: 110px; }
+    .detail-ingredients-empty {
+      color: var(--muted);
+      font-style: italic;
+      padding: 4px 0;
+    }
+    .detail-cure-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      flex-wrap: wrap;
+    }
+    .detail-cure-edit { display: none; margin-top: 8px; }
+    .detail-cure-edit.open { display: block; }
+    .detail-cure-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+    .detail-delete-wrap {
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    /* Toast: allow interaction (View in Batches link) when visible */
+    .toast[data-visible] { pointer-events: auto; }
+    .toast .toast-link {
+      color: #9ec5ff;
+      text-decoration: underline;
+      margin-left: 10px;
+      font-weight: 600;
+    }
+
     /* --- Recipe list (inside Load modal) --- */
     .recipe-list {
       display: flex;
@@ -865,6 +1142,164 @@
     </div>
   </div>
 
+  <div id="start-batch-modal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="start-batch-title">
+      <div class="modal-header">
+        <h2 id="start-batch-title">Start a batch</h2>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <label class="modal-label" for="start-batch-name">Name</label>
+          <input id="start-batch-name" class="modal-input" type="text" autocomplete="off" maxlength="200">
+        </div>
+        <div class="modal-field modal-field-row">
+          <div>
+            <label class="modal-label" for="start-batch-date">Date made</label>
+            <input id="start-batch-date" class="modal-input" type="date">
+          </div>
+          <div>
+            <span class="modal-label">Essential oil</span>
+            <div id="start-batch-eo" class="modal-readonly-pill">Heavy</div>
+          </div>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label" for="start-batch-notes">Notes (optional)</label>
+          <textarea id="start-batch-notes" class="modal-input" rows="2" maxlength="2000" placeholder="Anything you want to remember about this batch"></textarea>
+        </div>
+        <div class="modal-field">
+          <span class="modal-label">Ingredients (from recipe)</span>
+          <div class="ingredient-summary">
+            <table>
+              <tbody id="start-batch-ingredients"></tbody>
+            </table>
+          </div>
+        </div>
+        <button type="button" class="advanced-toggle" id="start-batch-advanced-toggle" aria-expanded="false">
+          <span class="caret">&#9656;</span> Advanced
+        </button>
+        <div class="advanced-panel" id="start-batch-advanced-body" hidden>
+          <div class="check-row">
+            <input type="checkbox" id="start-batch-override-cb">
+            <label for="start-batch-override-cb">Override cure time</label>
+          </div>
+          <div class="override-row">
+            <input type="number" id="start-batch-override-days" min="1" step="1" inputmode="numeric">
+            <span class="hint">days (default is <span data-default-cure-time>35</span>)</span>
+          </div>
+        </div>
+        <p id="start-batch-error" class="modal-error" hidden></p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-start-batch-cancel>Cancel</button>
+        <button type="button" class="btn btn-primary" data-start-batch-confirm>Start batch</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="new-batch-modal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="new-batch-title">
+      <div class="modal-header">
+        <h2 id="new-batch-title">New batch</h2>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <label class="modal-label" for="new-batch-name">Name</label>
+          <input id="new-batch-name" class="modal-input" type="text" autocomplete="off" maxlength="200" placeholder="e.g. Lavender Spring 2026">
+        </div>
+        <div class="modal-field" style="max-width: 60%;">
+          <label class="modal-label" for="new-batch-date">Date made</label>
+          <input id="new-batch-date" class="modal-input" type="date">
+        </div>
+        <div class="modal-field">
+          <span class="modal-label">Ingredients</span>
+          <div id="new-batch-ingredients"></div>
+          <button type="button" class="add-ingredient-btn" data-add-ingredient>+ Add ingredient</button>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label" for="new-batch-notes">Notes (optional)</label>
+          <textarea id="new-batch-notes" class="modal-input" rows="2" maxlength="2000"></textarea>
+        </div>
+        <button type="button" class="advanced-toggle" id="new-batch-advanced-toggle" aria-expanded="false">
+          <span class="caret">&#9656;</span> Advanced
+        </button>
+        <div class="advanced-panel" id="new-batch-advanced-body" hidden>
+          <div class="check-row">
+            <input type="checkbox" id="new-batch-override-cb">
+            <label for="new-batch-override-cb">Override cure time</label>
+          </div>
+          <div class="override-row">
+            <input type="number" id="new-batch-override-days" min="1" step="1" inputmode="numeric">
+            <span class="hint">days (default is <span data-default-cure-time>35</span>)</span>
+          </div>
+        </div>
+        <p id="new-batch-error" class="modal-error" hidden></p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-new-batch-cancel>Cancel</button>
+        <button type="button" class="btn btn-primary" data-new-batch-confirm>Save batch</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="detail-modal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detail-modal-title">
+      <div class="detail-back-bar">
+        <button type="button" class="btn-link" data-detail-back>&#8249; Back</button>
+        <div class="title" id="detail-modal-title">Batch</div>
+        <span class="spacer"></span>
+      </div>
+      <div class="modal-body">
+        <div class="detail-header">
+          <div class="detail-name-container" id="detail-name-container"></div>
+          <button type="button" class="detail-edit-pencil" data-detail-name-edit>&#x270e; Edit</button>
+        </div>
+        <div class="detail-date" id="detail-date"></div>
+
+        <!-- TODO: replace with real maturity calc in next session -->
+        <div class="detail-progress-row">
+          <div class="detail-progress-bar"><div class="detail-progress-fill" style="width: 50%"></div></div>
+          <span class="detail-status-badge">Curing</span>
+        </div>
+
+        <div class="detail-section">
+          <h3>Ingredients</h3>
+          <div id="detail-ingredients-container"></div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Notes</h3>
+          <textarea id="detail-notes" class="modal-input" rows="4"></textarea>
+        </div>
+
+        <div class="detail-section">
+          <h3>Cure time</h3>
+          <div class="detail-cure-row" id="detail-cure-display">
+            <span id="detail-cure-text"></span>
+            <button type="button" class="btn btn-small" data-detail-cure-edit>Edit</button>
+          </div>
+          <div class="detail-cure-edit" id="detail-cure-edit">
+            <div class="check-row">
+              <input type="checkbox" id="detail-override-cb">
+              <label for="detail-override-cb">Override cure time</label>
+            </div>
+            <div class="override-row">
+              <input type="number" id="detail-override-days" min="1" step="1" inputmode="numeric">
+              <span class="hint">days (default is <span id="detail-cure-default">35</span>)</span>
+            </div>
+            <div class="detail-cure-actions">
+              <button type="button" class="btn" data-detail-cure-cancel>Cancel</button>
+              <button type="button" class="btn btn-primary" data-detail-cure-save>Save</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-delete-wrap">
+          <button type="button" class="btn btn-danger" data-detail-delete>Delete batch</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="load-modal" class="modal-backdrop" hidden>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="load-modal-title">
       <div class="modal-header">
@@ -909,6 +1344,7 @@
         <div class="recipe-action-bar" role="group" aria-label="Recipe actions">
           <button type="button" class="btn" data-save-recipe disabled>Save Recipe</button>
           <button type="button" class="btn" data-load-recipe>Load Recipe</button>
+          <button type="button" class="btn" data-start-batch disabled>Start a batch</button>
           <button type="button" class="btn" data-print-recipe disabled>Print</button>
         </div>
       </section>
@@ -1024,9 +1460,14 @@
       </div><!-- /#calculator-panel -->
 
       <div id="batches-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-batches" hidden>
-        <div class="empty-state">
-          <p class="empty-state-title">No batches yet</p>
-          <p class="empty-state-sub">Batches you make will appear here</p>
+        <div class="batches-empty">
+          <div class="new-batch-row">
+            <button type="button" class="btn btn-primary" data-new-batch>+ New batch</button>
+          </div>
+          <div class="empty-state">
+            <p class="empty-state-title">No batches yet</p>
+            <p class="empty-state-sub">Batches you make will appear here</p>
+          </div>
         </div>
       </div>
     </section>
@@ -1137,10 +1578,19 @@
       view: 'main',
       tab: 'calculator',
       measuring: false,
-      loadedRecipeId: null
+      loadedRecipeId: null,
+      detailBatchId: null
     };
 
     var TABS = ['calculator', 'batches'];
+
+    var INGREDIENT_LABELS = {
+      lard: 'Lard',
+      coconut_oil: 'Coconut Oil',
+      lye: 'Lye',
+      water: 'Water',
+      essential_oil: 'Essential Oil'
+    };
 
     var statusEl = document.getElementById('status');
     var settingsStatusEl = document.getElementById('settings-status');
@@ -1251,6 +1701,7 @@
       renderAnchorClass();
       updateSaveRecipeEnabled();
       updatePrintEnabled();
+      updateStartBatchEnabled();
     }
 
     function onInput(e) {
@@ -1270,6 +1721,7 @@
       renderAllInputs(field);
       updateSaveRecipeEnabled();
       updatePrintEnabled();
+      updateStartBatchEnabled();
     }
 
     function onBlur(e) {
@@ -1289,6 +1741,7 @@
       });
       updateSaveRecipeEnabled();
       updatePrintEnabled();
+      updateStartBatchEnabled();
     }
 
     function setEoType(type) {
@@ -1340,11 +1793,25 @@
       }, durationMs || 2000);
     }
 
-    // ---- tabs (SPEC §10.4) ----
+    // ---- tabs + hash routing (SPEC §10.4) ----
+    //
+    // Hash patterns:
+    //   <empty> or #calculator  → calculator tab
+    //   #batches                → batches tab, list view
+    //   #batches/<id>           → batches tab + batch detail open
+    //
+    // The #batches/<id> form is temporary for this session — the list view
+    // hasn't been built yet, so direct-URL is the only way to open a detail.
 
-    function tabFromHash() {
+    function parseHash() {
       var h = (location.hash || '').replace(/^#/, '');
-      return TABS.indexOf(h) >= 0 ? h : 'calculator';
+      if (h === '' || h === 'calculator') return { tab: 'calculator', batchId: null };
+      if (h === 'batches') return { tab: 'batches', batchId: null };
+      if (h.indexOf('batches/') === 0) {
+        var id = h.slice('batches/'.length);
+        return { tab: 'batches', batchId: id || null };
+      }
+      return { tab: 'calculator', batchId: null };
     }
 
     function applyTab(name) {
@@ -1359,20 +1826,32 @@
       });
     }
 
+    function applyHashRoute() {
+      var route = parseHash();
+      applyTab(route.tab);
+      if (route.tab === 'batches' && route.batchId) {
+        openBatchDetail(route.batchId);
+      } else {
+        closeBatchDetail();
+      }
+    }
+
     function setTab(name) {
       if (TABS.indexOf(name) < 0) name = 'calculator';
-      if (state.tab === name && location.hash.replace(/^#/, '') === name) return;
-      // Updating the hash fires hashchange, which calls applyTab.
-      // Update directly first so the click feels instant even if hashchange
+      var current = parseHash();
+      if (current.tab === name && !current.batchId) return;
+      // Updating the hash fires hashchange, which calls applyHashRoute.
+      // Update locally first so the click feels instant even if hashchange
       // is delayed by browser quirks.
       applyTab(name);
+      closeBatchDetail();
       if (location.hash.replace(/^#/, '') !== name) {
         location.hash = '#' + name;
       }
     }
 
     function onHashChange() {
-      applyTab(tabFromHash());
+      applyHashRoute();
     }
 
     // ---- views ----
@@ -1943,8 +2422,697 @@
       });
       updateSaveRecipeEnabled();
       updatePrintEnabled();
+      updateStartBatchEnabled();
       closeLoadModal();
       showToast('Loaded: ' + recipe.name);
+    }
+
+    // ---- batches (SPEC §10) ----
+
+    function todayIsoDate() {
+      var d = new Date();
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+
+    function shortMonthDay(d) {
+      try {
+        return d.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+      } catch (e) {
+        return todayIsoDate();
+      }
+    }
+
+    function longDateLabel(iso) {
+      if (!iso) return '';
+      var parts = String(iso).split('-');
+      if (parts.length !== 3) return iso;
+      var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      if (isNaN(d.getTime())) return iso;
+      try {
+        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch (e) {
+        return iso;
+      }
+    }
+
+    function genBatchId() {
+      return 'batch_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    }
+
+    function defaultCureTime() {
+      return (state.data && state.data.settings && state.data.settings.default_cure_time_days != null)
+        ? state.data.settings.default_cure_time_days
+        : 35;
+    }
+
+    function snapshotCurrentIngredients() {
+      // Snapshot at full precision (not the displayed-rounded value), in grams.
+      // The active EO factor (Heavy/Light) is implicit in fieldFactor('essential_oil').
+      return INGREDIENT_FIELDS.map(function (f) {
+        var g = (f === state.anchorField) ? state.anchorWeightG : weightForField(f);
+        return { name: INGREDIENT_LABELS[f], weight_g: g };
+      });
+    }
+
+    function findBatch(id) {
+      return ((state.data && state.data.batches) || []).find(function (b) { return b.id === id; }) || null;
+    }
+
+    function updateBatchPut(id, mutator) {
+      var newData = JSON.parse(JSON.stringify(state.data));
+      newData.batches = (newData.batches || []).slice();
+      var idx = -1;
+      for (var i = 0; i < newData.batches.length; i++) {
+        if (newData.batches[i].id === id) { idx = i; break; }
+      }
+      if (idx < 0) return Promise.reject(new Error('batch not found'));
+      var existing = newData.batches[idx];
+      var updated = mutator(JSON.parse(JSON.stringify(existing)));
+      // Re-anchor immutable fields from the existing stored copy so the UI
+      // can never accidentally mutate them. The server enforces this too.
+      updated.id = existing.id;
+      updated.date_made = existing.date_made;
+      updated.ingredients = existing.ingredients;
+      updated.source_recipe_id = existing.source_recipe_id;
+      updated.created_at = existing.created_at;
+      newData.batches[idx] = updated;
+      return fetch('/api/data', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newData)
+      }).then(function (r) {
+        if (!r.ok) {
+          return r.json().then(function (e) {
+            throw new Error(e && e.error ? e.error : 'HTTP ' + r.status);
+          });
+        }
+        state.data = newData;
+        return updated;
+      });
+    }
+
+    function deleteBatchPut(id) {
+      var newData = JSON.parse(JSON.stringify(state.data));
+      newData.batches = (newData.batches || []).filter(function (b) { return b.id !== id; });
+      return fetch('/api/data', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newData)
+      }).then(function (r) {
+        if (!r.ok) {
+          return r.json().then(function (e) {
+            throw new Error(e && e.error ? e.error : 'HTTP ' + r.status);
+          });
+        }
+        state.data = newData;
+      });
+    }
+
+    function wireAdvancedToggle(toggleEl, panelEl, cbEl, daysEl) {
+      toggleEl.addEventListener('click', function () {
+        var open = !panelEl.hidden;
+        panelEl.hidden = open;
+        toggleEl.setAttribute('aria-expanded', open ? 'false' : 'true');
+        toggleEl.querySelector('.caret').textContent = open ? '▸' : '▾';
+      });
+      cbEl.addEventListener('change', function () {
+        daysEl.disabled = !cbEl.checked;
+        if (cbEl.checked) {
+          daysEl.classList.remove('invalid');
+          setTimeout(function () { daysEl.focus(); daysEl.select(); }, 0);
+        }
+      });
+    }
+
+    function validateCureOverride(cbEl, daysEl) {
+      if (!cbEl.checked) return { ok: true, value: null };
+      var raw = daysEl.value.trim();
+      var n = Number(raw);
+      if (raw === '' || !isFinite(n) || !Number.isInteger(n) || n <= 0) {
+        daysEl.classList.add('invalid');
+        return { ok: false, error: 'Cure time must be a positive whole number of days.' };
+      }
+      daysEl.classList.remove('invalid');
+      return { ok: true, value: n };
+    }
+
+    // ---- Start a batch (from recipe) ----
+
+    function openStartBatchModal() {
+      if (state.anchorWeightG == null) return;
+      var nameEl = document.getElementById('start-batch-name');
+      var dateEl = document.getElementById('start-batch-date');
+      var notesEl = document.getElementById('start-batch-notes');
+      var eoEl = document.getElementById('start-batch-eo');
+      var ingEl = document.getElementById('start-batch-ingredients');
+      var overrideCb = document.getElementById('start-batch-override-cb');
+      var overrideInput = document.getElementById('start-batch-override-days');
+      var advBody = document.getElementById('start-batch-advanced-body');
+      var advToggle = document.getElementById('start-batch-advanced-toggle');
+      var errEl = document.getElementById('start-batch-error');
+
+      var loaded = currentLoadedRecipe();
+      nameEl.value = loaded ? loaded.name : ('Batch made ' + shortMonthDay(new Date()));
+      nameEl.classList.remove('invalid');
+      dateEl.value = todayIsoDate();
+      notesEl.value = '';
+      eoEl.textContent = state.eoType === 'heavy' ? 'Heavy' : 'Light';
+      errEl.hidden = true; errEl.textContent = '';
+
+      ingEl.innerHTML = '';
+      snapshotCurrentIngredients().forEach(function (it) {
+        var tr = document.createElement('tr');
+        var n = document.createElement('td'); n.className = 'name'; n.textContent = it.name;
+        var w = document.createElement('td'); w.className = 'weight';
+        w.textContent = (it.weight_g != null) ? it.weight_g.toFixed(2) + ' g' : '';
+        tr.appendChild(n); tr.appendChild(w);
+        ingEl.appendChild(tr);
+      });
+
+      overrideCb.checked = false;
+      overrideInput.value = String(defaultCureTime());
+      overrideInput.disabled = true;
+      overrideInput.classList.remove('invalid');
+      advBody.hidden = true;
+      advToggle.setAttribute('aria-expanded', 'false');
+      advToggle.querySelector('.caret').textContent = '▸';
+
+      document.querySelectorAll('[data-default-cure-time]').forEach(function (s) {
+        s.textContent = String(defaultCureTime());
+      });
+
+      document.getElementById('start-batch-modal').hidden = false;
+      bodyScrollLock(true);
+      setTimeout(function () { nameEl.focus(); nameEl.select(); }, 30);
+    }
+
+    function closeStartBatchModal() {
+      document.getElementById('start-batch-modal').hidden = true;
+      bodyScrollLock(false);
+    }
+
+    function startBatchFromModal() {
+      var nameEl = document.getElementById('start-batch-name');
+      var dateEl = document.getElementById('start-batch-date');
+      var notesEl = document.getElementById('start-batch-notes');
+      var overrideCb = document.getElementById('start-batch-override-cb');
+      var overrideInput = document.getElementById('start-batch-override-days');
+      var errEl = document.getElementById('start-batch-error');
+      var confirmBtn = document.querySelector('[data-start-batch-confirm]');
+
+      nameEl.classList.remove('invalid');
+      errEl.hidden = true; errEl.textContent = '';
+
+      var name = nameEl.value.trim();
+      if (name === '') {
+        nameEl.classList.add('invalid');
+        errEl.textContent = 'Please enter a name.';
+        errEl.hidden = false; nameEl.focus(); return;
+      }
+      var dateMade = dateEl.value;
+      if (!dateMade) {
+        errEl.textContent = 'Please pick a date.';
+        errEl.hidden = false; dateEl.focus(); return;
+      }
+      var cure = validateCureOverride(overrideCb, overrideInput);
+      if (!cure.ok) {
+        errEl.textContent = cure.error;
+        errEl.hidden = false; overrideInput.focus(); return;
+      }
+
+      var batch = {
+        id: genBatchId(),
+        name: name,
+        date_made: dateMade,
+        ingredients: snapshotCurrentIngredients(),
+        cure_time_days_override: cure.value,
+        notes: notesEl.value.trim(),
+        source_recipe_id: state.loadedRecipeId || null,
+        created_at: new Date().toISOString()
+      };
+
+      var newData = JSON.parse(JSON.stringify(state.data));
+      newData.batches = (newData.batches || []).slice();
+      newData.batches.push(batch);
+
+      confirmBtn.disabled = true;
+      fetch('/api/data', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newData)
+      }).then(function (r) {
+        if (!r.ok) {
+          return r.json().then(function (e) {
+            throw new Error(e && e.error ? e.error : 'HTTP ' + r.status);
+          });
+        }
+        return r.json();
+      }).then(function () {
+        state.data = newData;
+        confirmBtn.disabled = false;
+        closeStartBatchModal();
+        showBatchToast('Batch started', true);
+      }).catch(function (err) {
+        confirmBtn.disabled = false;
+        errEl.textContent = 'Save failed: ' + err.message;
+        errEl.hidden = false;
+      });
+    }
+
+    function showBatchToast(message, withViewLink) {
+      toastEl.innerHTML = '';
+      toastEl.appendChild(document.createTextNode(message));
+      if (withViewLink) {
+        var link = document.createElement('a');
+        link.href = '#batches';
+        link.className = 'toast-link';
+        link.textContent = 'View in Batches';
+        toastEl.appendChild(link);
+      }
+      toastEl.hidden = false;
+      void toastEl.offsetWidth;
+      toastEl.setAttribute('data-visible', '');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () {
+        toastEl.removeAttribute('data-visible');
+        toastTimer = setTimeout(function () {
+          toastEl.hidden = true; toastEl.innerHTML = ''; toastTimer = null;
+        }, 260);
+      }, withViewLink ? 4000 : 2000);
+    }
+
+    // ---- New batch (blank/historical) ----
+
+    function openNewBatchModal() {
+      var nameEl = document.getElementById('new-batch-name');
+      var dateEl = document.getElementById('new-batch-date');
+      var notesEl = document.getElementById('new-batch-notes');
+      var ingEl = document.getElementById('new-batch-ingredients');
+      var overrideCb = document.getElementById('new-batch-override-cb');
+      var overrideInput = document.getElementById('new-batch-override-days');
+      var advBody = document.getElementById('new-batch-advanced-body');
+      var advToggle = document.getElementById('new-batch-advanced-toggle');
+      var errEl = document.getElementById('new-batch-error');
+
+      nameEl.value = '';
+      nameEl.classList.remove('invalid');
+      dateEl.value = todayIsoDate();
+      notesEl.value = '';
+      ingEl.innerHTML = '';
+      overrideCb.checked = false;
+      overrideInput.value = String(defaultCureTime());
+      overrideInput.disabled = true;
+      overrideInput.classList.remove('invalid');
+      advBody.hidden = true;
+      advToggle.setAttribute('aria-expanded', 'false');
+      advToggle.querySelector('.caret').textContent = '▸';
+      errEl.hidden = true; errEl.textContent = '';
+
+      document.querySelectorAll('[data-default-cure-time]').forEach(function (s) {
+        s.textContent = String(defaultCureTime());
+      });
+
+      document.getElementById('new-batch-modal').hidden = false;
+      bodyScrollLock(true);
+      setTimeout(function () { nameEl.focus(); }, 30);
+    }
+
+    function closeNewBatchModal() {
+      document.getElementById('new-batch-modal').hidden = true;
+      bodyScrollLock(false);
+    }
+
+    function addNewBatchIngredientRow() {
+      var ingEl = document.getElementById('new-batch-ingredients');
+      var row = document.createElement('div');
+      row.className = 'ingredient-row';
+
+      var n = document.createElement('input');
+      n.type = 'text';
+      n.className = 'modal-input ingredient-name';
+      n.placeholder = 'Ingredient';
+      n.maxLength = 80;
+      n.autocomplete = 'off';
+
+      var w = document.createElement('input');
+      w.type = 'number';
+      w.className = 'modal-input ingredient-weight';
+      w.placeholder = 'g';
+      w.min = '0';
+      w.step = 'any';
+      w.inputMode = 'decimal';
+
+      var rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'ingredient-remove';
+      rm.setAttribute('aria-label', 'Remove ingredient');
+      rm.textContent = '×';
+      rm.addEventListener('click', function () { row.remove(); });
+
+      row.appendChild(n);
+      row.appendChild(w);
+      row.appendChild(rm);
+      ingEl.appendChild(row);
+      setTimeout(function () { n.focus(); }, 10);
+    }
+
+    function saveNewBatchFromModal() {
+      var nameEl = document.getElementById('new-batch-name');
+      var dateEl = document.getElementById('new-batch-date');
+      var notesEl = document.getElementById('new-batch-notes');
+      var ingEl = document.getElementById('new-batch-ingredients');
+      var overrideCb = document.getElementById('new-batch-override-cb');
+      var overrideInput = document.getElementById('new-batch-override-days');
+      var errEl = document.getElementById('new-batch-error');
+      var confirmBtn = document.querySelector('[data-new-batch-confirm]');
+
+      nameEl.classList.remove('invalid');
+      errEl.hidden = true; errEl.textContent = '';
+
+      var name = nameEl.value.trim();
+      if (name === '') {
+        nameEl.classList.add('invalid');
+        errEl.textContent = 'Please enter a name.';
+        errEl.hidden = false; nameEl.focus(); return;
+      }
+      var dateMade = dateEl.value;
+      if (!dateMade) {
+        errEl.textContent = 'Please pick a date.';
+        errEl.hidden = false; dateEl.focus(); return;
+      }
+
+      var ingredients = [];
+      var rows = ingEl.querySelectorAll('.ingredient-row');
+      for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var nInp = row.querySelector('.ingredient-name');
+        var wInp = row.querySelector('.ingredient-weight');
+        nInp.classList.remove('invalid');
+        wInp.classList.remove('invalid');
+        var iname = nInp.value.trim();
+        var rawW = wInp.value.trim();
+        if (iname === '' && rawW === '') continue; // user added then ignored — skip
+        if (iname === '') {
+          nInp.classList.add('invalid');
+          errEl.textContent = 'Ingredient #' + (i + 1) + ' has a weight but no name.';
+          errEl.hidden = false; nInp.focus(); return;
+        }
+        var weightG = null;
+        if (rawW !== '') {
+          var w = Number(rawW);
+          if (!isFinite(w) || w < 0) {
+            wInp.classList.add('invalid');
+            errEl.textContent = 'Ingredient #' + (i + 1) + ' has an invalid weight.';
+            errEl.hidden = false; wInp.focus(); return;
+          }
+          weightG = w;
+        }
+        ingredients.push({ name: iname, weight_g: weightG });
+      }
+
+      var cure = validateCureOverride(overrideCb, overrideInput);
+      if (!cure.ok) {
+        errEl.textContent = cure.error;
+        errEl.hidden = false; overrideInput.focus(); return;
+      }
+
+      var batch = {
+        id: genBatchId(),
+        name: name,
+        date_made: dateMade,
+        ingredients: ingredients,
+        cure_time_days_override: cure.value,
+        notes: notesEl.value.trim(),
+        source_recipe_id: null,
+        created_at: new Date().toISOString()
+      };
+
+      var newData = JSON.parse(JSON.stringify(state.data));
+      newData.batches = (newData.batches || []).slice();
+      newData.batches.push(batch);
+
+      confirmBtn.disabled = true;
+      fetch('/api/data', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newData)
+      }).then(function (r) {
+        if (!r.ok) {
+          return r.json().then(function (e) {
+            throw new Error(e && e.error ? e.error : 'HTTP ' + r.status);
+          });
+        }
+        return r.json();
+      }).then(function () {
+        state.data = newData;
+        confirmBtn.disabled = false;
+        closeNewBatchModal();
+        showBatchToast('Batch saved', false);
+      }).catch(function (err) {
+        confirmBtn.disabled = false;
+        errEl.textContent = 'Save failed: ' + err.message;
+        errEl.hidden = false;
+      });
+    }
+
+    function updateStartBatchEnabled() {
+      var btn = document.querySelector('[data-start-batch]');
+      if (btn) btn.disabled = (state.anchorWeightG == null);
+    }
+
+    // ---- Batch detail view (SPEC §10.5.3) ----
+
+    function openBatchDetail(id) {
+      var batch = findBatch(id);
+      if (!batch) {
+        // Stale or unknown id — strip from the hash and bail.
+        if (location.hash !== '#batches') {
+          history.replaceState(null, '', '#batches');
+        }
+        closeBatchDetail();
+        return;
+      }
+      state.detailBatchId = id;
+      renderBatchDetail(batch);
+      var modal = document.getElementById('detail-modal');
+      if (modal.hidden) {
+        modal.hidden = false;
+        bodyScrollLock(true);
+      }
+    }
+
+    function closeBatchDetail() {
+      var modal = document.getElementById('detail-modal');
+      if (modal.hidden && state.detailBatchId == null) return;
+      modal.hidden = true;
+      state.detailBatchId = null;
+      // Reset cure-time edit panel
+      document.getElementById('detail-cure-edit').classList.remove('open');
+      document.getElementById('detail-cure-display').hidden = false;
+      bodyScrollLock(false);
+    }
+
+    function renderBatchDetail(batch) {
+      // Name + edit pencil
+      var container = document.getElementById('detail-name-container');
+      container.innerHTML = '';
+      var span = document.createElement('span');
+      span.className = 'detail-name';
+      span.id = 'detail-name';
+      span.textContent = batch.name;
+      span.addEventListener('click', enterDetailNameEdit);
+      container.appendChild(span);
+      var pencil = document.querySelector('[data-detail-name-edit]');
+      pencil.hidden = false;
+
+      // Date made (read-only)
+      document.getElementById('detail-date').textContent = 'Made ' + longDateLabel(batch.date_made);
+
+      // Ingredients (read-only)
+      var ingContainer = document.getElementById('detail-ingredients-container');
+      ingContainer.innerHTML = '';
+      if (!batch.ingredients || batch.ingredients.length === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'detail-ingredients-empty';
+        empty.textContent = '(no ingredients recorded)';
+        ingContainer.appendChild(empty);
+      } else {
+        var wrap = document.createElement('div');
+        wrap.className = 'ingredient-summary';
+        var tbl = document.createElement('table');
+        var tbody = document.createElement('tbody');
+        batch.ingredients.forEach(function (it) {
+          var tr = document.createElement('tr');
+          var n = document.createElement('td'); n.className = 'name'; n.textContent = it.name;
+          var w = document.createElement('td'); w.className = 'weight';
+          w.textContent = (it.weight_g != null) ? Number(it.weight_g).toFixed(2) + ' g' : '—';
+          tr.appendChild(n); tr.appendChild(w);
+          tbody.appendChild(tr);
+        });
+        tbl.appendChild(tbody);
+        wrap.appendChild(tbl);
+        ingContainer.appendChild(wrap);
+      }
+
+      // Notes
+      document.getElementById('detail-notes').value = batch.notes || '';
+
+      // Cure time line
+      renderDetailCureLine(batch);
+
+      // Reset cure edit panel
+      document.getElementById('detail-cure-edit').classList.remove('open');
+      document.getElementById('detail-cure-display').hidden = false;
+    }
+
+    function renderDetailCureLine(batch) {
+      var def = defaultCureTime();
+      var text;
+      if (batch.cure_time_days_override != null) {
+        text = batch.cure_time_days_override + ' days (overridden — default is ' + def + ')';
+      } else {
+        text = def + ' days (default)';
+      }
+      document.getElementById('detail-cure-text').textContent = text;
+    }
+
+    function enterDetailNameEdit() {
+      var batch = findBatch(state.detailBatchId);
+      if (!batch) return;
+      var container = document.getElementById('detail-name-container');
+      container.innerHTML = '';
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'detail-name-edit';
+      input.value = batch.name;
+      input.maxLength = 200;
+      container.appendChild(input);
+      document.querySelector('[data-detail-name-edit]').hidden = true;
+      setTimeout(function () { input.focus(); input.select(); }, 10);
+
+      var done = false;
+      function finish(commit) {
+        if (done) return;
+        done = true;
+        var newName = input.value.trim();
+        if (!commit || newName === '' || newName === batch.name) {
+          renderBatchDetail(findBatch(batch.id));
+          return;
+        }
+        updateBatchPut(batch.id, function (b) { b.name = newName; return b; })
+          .then(function () { renderBatchDetail(findBatch(batch.id)); })
+          .catch(function (err) {
+            alert('Save failed: ' + err.message);
+            renderBatchDetail(findBatch(batch.id));
+          });
+      }
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+        else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+      });
+      input.addEventListener('blur', function () { finish(true); });
+    }
+
+    function onDetailNotesBlur() {
+      if (state.detailBatchId == null) return;
+      var batch = findBatch(state.detailBatchId);
+      if (!batch) return;
+      var notesEl = document.getElementById('detail-notes');
+      var current = notesEl.value;
+      if (current === (batch.notes || '')) return;
+      updateBatchPut(batch.id, function (b) { b.notes = current; return b; })
+        .catch(function (err) {
+          alert('Save failed: ' + err.message);
+          notesEl.value = batch.notes || '';
+        });
+    }
+
+    function openCureEdit() {
+      var batch = findBatch(state.detailBatchId);
+      if (!batch) return;
+      var cb = document.getElementById('detail-override-cb');
+      var days = document.getElementById('detail-override-days');
+      var def = defaultCureTime();
+      document.getElementById('detail-cure-default').textContent = String(def);
+      if (batch.cure_time_days_override != null) {
+        cb.checked = true;
+        days.value = String(batch.cure_time_days_override);
+        days.disabled = false;
+      } else {
+        cb.checked = false;
+        days.value = String(def);
+        days.disabled = true;
+      }
+      days.classList.remove('invalid');
+      document.getElementById('detail-cure-display').hidden = true;
+      document.getElementById('detail-cure-edit').classList.add('open');
+    }
+
+    function closeCureEdit() {
+      document.getElementById('detail-cure-display').hidden = false;
+      document.getElementById('detail-cure-edit').classList.remove('open');
+    }
+
+    function saveCureEdit() {
+      var batch = findBatch(state.detailBatchId);
+      if (!batch) return;
+      var cb = document.getElementById('detail-override-cb');
+      var daysInput = document.getElementById('detail-override-days');
+      var cure = validateCureOverride(cb, daysInput);
+      if (!cure.ok) {
+        alert(cure.error);
+        return;
+      }
+      var current = batch.cure_time_days_override == null ? null : batch.cure_time_days_override;
+      if (cure.value === current) {
+        closeCureEdit();
+        return;
+      }
+      updateBatchPut(batch.id, function (b) { b.cure_time_days_override = cure.value; return b; })
+        .then(function () {
+          renderBatchDetail(findBatch(batch.id));
+        })
+        .catch(function (err) { alert('Save failed: ' + err.message); });
+    }
+
+    function deleteBatchFromDetail() {
+      var batch = findBatch(state.detailBatchId);
+      if (!batch) return;
+      if (!window.confirm("Delete '" + batch.name + "'?")) return;
+      deleteBatchPut(batch.id)
+        .then(function () {
+          // Navigate back to the batches list. hashchange → applyHashRoute
+          // will close the detail modal.
+          if (location.hash === '#batches') {
+            closeBatchDetail();
+          } else {
+            location.hash = '#batches';
+          }
+        })
+        .catch(function (err) { alert('Delete failed: ' + err.message); });
+    }
+
+    function onGlobalKeydown(e) {
+      if (e.key !== 'Escape') return;
+      if (!document.getElementById('detail-modal').hidden) {
+        e.preventDefault();
+        if (location.hash !== '#batches') location.hash = '#batches';
+        else closeBatchDetail();
+        return;
+      }
+      if (!document.getElementById('start-batch-modal').hidden) {
+        e.preventDefault();
+        closeStartBatchModal();
+        return;
+      }
+      if (!document.getElementById('new-batch-modal').hidden) {
+        e.preventDefault();
+        closeNewBatchModal();
+        return;
+      }
     }
 
     // ---- wiring ----
@@ -1995,6 +3163,65 @@
       document.querySelector('[data-save-modal-cancel]').addEventListener('click', closeSaveModal);
       document.querySelector('[data-save-modal-confirm]').addEventListener('click', saveRecipeFromModal);
       document.querySelector('[data-load-modal-close]').addEventListener('click', closeLoadModal);
+
+      // ---- batches: start-a-batch ----
+      document.querySelector('[data-start-batch]').addEventListener('click', openStartBatchModal);
+      document.querySelector('[data-start-batch-cancel]').addEventListener('click', closeStartBatchModal);
+      document.querySelector('[data-start-batch-confirm]').addEventListener('click', startBatchFromModal);
+      wireAdvancedToggle(
+        document.getElementById('start-batch-advanced-toggle'),
+        document.getElementById('start-batch-advanced-body'),
+        document.getElementById('start-batch-override-cb'),
+        document.getElementById('start-batch-override-days')
+      );
+
+      // ---- batches: new (blank) ----
+      document.querySelector('[data-new-batch]').addEventListener('click', openNewBatchModal);
+      document.querySelector('[data-new-batch-cancel]').addEventListener('click', closeNewBatchModal);
+      document.querySelector('[data-new-batch-confirm]').addEventListener('click', saveNewBatchFromModal);
+      document.querySelector('[data-add-ingredient]').addEventListener('click', addNewBatchIngredientRow);
+      wireAdvancedToggle(
+        document.getElementById('new-batch-advanced-toggle'),
+        document.getElementById('new-batch-advanced-body'),
+        document.getElementById('new-batch-override-cb'),
+        document.getElementById('new-batch-override-days')
+      );
+
+      // ---- batches: detail view ----
+      document.querySelector('[data-detail-back]').addEventListener('click', function () {
+        if (location.hash !== '#batches') location.hash = '#batches';
+        else closeBatchDetail();
+      });
+      document.querySelector('[data-detail-name-edit]').addEventListener('click', enterDetailNameEdit);
+      document.getElementById('detail-notes').addEventListener('blur', onDetailNotesBlur);
+      document.querySelector('[data-detail-cure-edit]').addEventListener('click', openCureEdit);
+      document.querySelector('[data-detail-cure-cancel]').addEventListener('click', closeCureEdit);
+      document.querySelector('[data-detail-cure-save]').addEventListener('click', saveCureEdit);
+      document.getElementById('detail-override-cb').addEventListener('change', function () {
+        document.getElementById('detail-override-days').disabled = !this.checked;
+        if (this.checked) {
+          var d = document.getElementById('detail-override-days');
+          d.classList.remove('invalid');
+          setTimeout(function () { d.focus(); d.select(); }, 0);
+        }
+      });
+      document.querySelector('[data-detail-delete]').addEventListener('click', deleteBatchFromDetail);
+
+      // Backdrop click closes the three new modals.
+      document.getElementById('start-batch-modal').addEventListener('click', function (e) {
+        if (e.target === this) closeStartBatchModal();
+      });
+      document.getElementById('new-batch-modal').addEventListener('click', function (e) {
+        if (e.target === this) closeNewBatchModal();
+      });
+      document.getElementById('detail-modal').addEventListener('click', function (e) {
+        if (e.target === this) {
+          if (location.hash !== '#batches') location.hash = '#batches';
+          else closeBatchDetail();
+        }
+      });
+      document.addEventListener('keydown', onGlobalKeydown);
+
       document.querySelectorAll('.tab-strip .tab').forEach(function (btn) {
         btn.addEventListener('click', function () { setTab(btn.dataset.tab); });
       });
@@ -2026,6 +3253,7 @@
       renderAnchorClass();
       updateSaveRecipeEnabled();
       updatePrintEnabled();
+      updateStartBatchEnabled();
     }
 
     function init() {
@@ -2037,7 +3265,7 @@
         .then(function (data) {
           applyDataFromServer(data);
           wireEvents();
-          applyTab(tabFromHash());
+          applyHashRoute();
           statusEl.textContent = '';
         })
         .catch(function (err) {

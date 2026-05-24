@@ -136,6 +136,70 @@ function handleGetData(res) {
   });
 }
 
+const IMMUTABLE_BATCH_FIELDS = ['id', 'date_made', 'source_recipe_id', 'created_at'];
+
+function ingredientsEqual(a, b) {
+  if (!Array.isArray(a) || !Array.isArray(b)) return a === b;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    const ai = a[i] || {};
+    const bi = b[i] || {};
+    if (ai.name !== bi.name) return false;
+    if (ai.weight_g !== bi.weight_g) return false;
+  }
+  return true;
+}
+
+function readStoredBatchesById() {
+  let raw;
+  try {
+    raw = fs.readFileSync(DATA_FILE, 'utf8');
+  } catch (err) {
+    return null;
+  }
+  let stored;
+  try {
+    stored = JSON.parse(raw);
+  } catch (err) {
+    return null;
+  }
+  const byId = Object.create(null);
+  const list = (stored && Array.isArray(stored.batches)) ? stored.batches : [];
+  for (let i = 0; i < list.length; i++) {
+    if (list[i] && typeof list[i].id === 'string') byId[list[i].id] = list[i];
+  }
+  return byId;
+}
+
+function batchLabel(batch) {
+  if (batch && typeof batch.name === 'string' && batch.name) return "'" + batch.name + "' (" + batch.id + ')';
+  return batch && batch.id ? batch.id : '<unknown>';
+}
+
+function validateBatchImmutability(parsed) {
+  if (!Array.isArray(parsed.batches)) return null; // nothing to validate
+  const storedById = readStoredBatchesById();
+  if (!storedById) return null; // no prior state to compare against (first write)
+  for (let i = 0; i < parsed.batches.length; i++) {
+    const incoming = parsed.batches[i];
+    if (!incoming || typeof incoming !== 'object') {
+      return 'batches[' + i + '] is not an object';
+    }
+    const stored = storedById[incoming.id];
+    if (!stored) continue; // new batch — accepted as-is
+    for (let j = 0; j < IMMUTABLE_BATCH_FIELDS.length; j++) {
+      const field = IMMUTABLE_BATCH_FIELDS[j];
+      if (incoming[field] !== stored[field]) {
+        return 'batch ' + batchLabel(stored) + ': immutable field "' + field + '" cannot be changed';
+      }
+    }
+    if (!ingredientsEqual(incoming.ingredients, stored.ingredients)) {
+      return 'batch ' + batchLabel(stored) + ': immutable field "ingredients" cannot be changed';
+    }
+  }
+  return null;
+}
+
 function handlePutData(req, res) {
   const chunks = [];
   let total = 0;
@@ -167,6 +231,20 @@ function handlePutData(req, res) {
       sendJson(res, 400, { error: 'expected a JSON object' });
       return;
     }
+
+    // SPEC §10.2: enforce batch immutability. Once a batch is created its
+    // id, date_made, ingredients, source_recipe_id, and created_at fields
+    // must never change — this is the contract that lets the UI show those
+    // fields as read-only after creation. Validate by comparing incoming
+    // batches against what's already on disk, matched by id; anything that
+    // would mutate an immutable field rejects the entire PUT.
+    const immutabilityError = validateBatchImmutability(parsed);
+    if (immutabilityError) {
+      logInfo('PUT /api/data rejected: ' + immutabilityError);
+      sendJson(res, 400, { error: immutabilityError });
+      return;
+    }
+
     const tmp = DATA_FILE + '.tmp';
     const serialized = JSON.stringify(parsed, null, 2) + '\n';
     fs.writeFile(tmp, serialized, (writeErr) => {
