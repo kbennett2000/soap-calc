@@ -31,6 +31,9 @@
     }
 
     * { box-sizing: border-box; }
+    /* Defensive: rules like ".batches-controls { display: flex }" would
+       otherwise override the HTML hidden attribute's default display:none. */
+    [hidden] { display: none !important; }
 
     html, body {
       margin: 0;
@@ -908,6 +911,179 @@
       .batches-table th, .batches-table td { padding: 8px 6px; font-size: 13px; }
     }
 
+    /* Search bar (SPEC §10.4.1) */
+    .batches-search { margin: 0 0 10px; }
+    .search-input-wrap { position: relative; display: block; }
+    .search-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 10px 44px 10px 14px;
+      font: inherit;
+      font-size: 16px;
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .search-clear {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+    }
+    .search-clear:hover { background: var(--toggle-bg); color: var(--fg); }
+
+    /* Filters disclosure header (must read as tappable, not a footnote) */
+    .batches-filters-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 10px;
+    }
+    .filters-disclosure {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 6px 12px;
+      background: transparent;
+      border: 0;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--fg);
+      cursor: pointer;
+      border-radius: 8px;
+      touch-action: manipulation;
+    }
+    .filters-disclosure:hover { background: var(--toggle-bg); }
+    .filters-disclosure .caret {
+      color: var(--muted);
+      width: 12px;
+      display: inline-block;
+      text-align: center;
+    }
+    .filters-disclosure .active-count {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .filters-header-clear { margin-left: auto; }
+
+    /* Filters expanded panel */
+    .batches-filters-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      background: #fafbfc;
+      border-radius: 10px;
+      margin: 0 0 14px;
+    }
+    .batches-filters-panel[hidden] { display: none; }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+    .filter-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .filter-sub-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .filter-date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .filter-input {
+      min-height: 44px;
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 15px;
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+    }
+    .filter-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .filter-input.invalid {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px var(--error-soft);
+    }
+    .filter-date-error {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: var(--error);
+    }
+    .filter-status-row { display: flex; flex-direction: column; gap: 6px; }
+    .filter-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      min-height: 32px;
+      cursor: pointer;
+    }
+    .filter-check input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+    .filters-panel-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 4px;
+    }
+
+    /* Filtered count line + filtered empty state */
+    .batches-filtered-count {
+      font-size: 14px;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+    .batches-filtered-empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 48px 12px;
+    }
+    .batches-filtered-empty p {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    /* Stack filter panel on phone */
+    @media (max-width: 719px) {
+      .batches-filters-panel { grid-template-columns: 1fr; padding: 12px 14px; }
+    }
+
     /* Batch detail view (SPEC §10.5.3) */
     .detail-back-bar {
       display: flex;
@@ -1635,6 +1811,57 @@
       </div><!-- /#calculator-panel -->
 
       <div id="batches-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-batches" hidden>
+        <div class="batches-search" id="batches-search-wrap" hidden>
+          <div class="search-input-wrap">
+            <input type="text" id="batches-search" class="search-input" placeholder="Search batches by name, ingredient, or notes" autocomplete="off" spellcheck="false" aria-label="Search batches">
+            <button type="button" class="search-clear" id="batches-search-clear" aria-label="Clear search" hidden>&times;</button>
+          </div>
+        </div>
+
+        <div class="batches-filters-header" id="batches-filters-header" hidden>
+          <button type="button" class="filters-disclosure" id="filters-toggle" aria-expanded="false" aria-controls="batches-filters-panel">
+            <span class="caret" aria-hidden="true">&#9656;</span>
+            <span>Filters</span>
+            <span class="active-count" id="filters-active-count" hidden></span>
+          </button>
+          <button type="button" class="btn-link filters-header-clear" id="filters-header-clear" data-clear-filters hidden>Clear filters</button>
+        </div>
+
+        <div class="batches-filters-panel" id="batches-filters-panel" hidden>
+          <div class="filter-group">
+            <div class="filter-label">Date range</div>
+            <div class="filter-date-row">
+              <label class="filter-sub-label">
+                <span>From</span>
+                <input type="date" id="filter-date-from" class="filter-input">
+              </label>
+              <label class="filter-sub-label">
+                <span>To</span>
+                <input type="date" id="filter-date-to" class="filter-input">
+              </label>
+            </div>
+            <p class="filter-date-error" id="filter-date-error" hidden>&ldquo;From&rdquo; must be on or before &ldquo;To&rdquo;.</p>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-label">Status</div>
+            <div class="filter-status-row">
+              <label class="filter-check"><input type="checkbox" data-filter-status="curing"> Curing</label>
+              <label class="filter-check"><input type="checkbox" data-filter-status="ready"> Ready</label>
+              <label class="filter-check"><input type="checkbox" data-filter-status="mature"> Mature</label>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-label">Ingredient</div>
+            <input type="text" id="filter-ingredient" class="filter-input" placeholder="e.g. lavender" autocomplete="off" spellcheck="false">
+          </div>
+
+          <div class="filters-panel-actions">
+            <button type="button" class="btn-link" data-clear-filters>Clear filters</button>
+          </div>
+        </div>
+
         <div class="batches-controls" id="batches-controls" hidden>
           <div class="toggle" role="group" aria-label="View mode">
             <button type="button" data-batches-view="table" aria-pressed="false">Table</button>
@@ -1643,7 +1870,12 @@
           <button type="button" class="btn btn-primary" data-new-batch>+ New batch</button>
         </div>
 
-        <!-- TODO: search + filters in next session -->
+        <div class="batches-filtered-count" id="batches-filtered-count" hidden></div>
+
+        <div id="batches-filtered-empty" class="batches-filtered-empty" hidden>
+          <p>No batches match your filters</p>
+          <button type="button" class="btn-link" data-clear-search-and-filters>Clear filters</button>
+        </div>
 
         <div id="batches-dashboard" class="batch-list" hidden></div>
 
@@ -1790,7 +2022,10 @@
       loadedRecipeId: null,
       detailBatchId: null,
       batchesView: 'dashboard',
-      batchesSort: { column: 'date_made', direction: 'desc' }
+      batchesSort: { column: 'date_made', direction: 'desc' },
+      batchesSearch: '',
+      batchesFilters: { dateFrom: '', dateTo: '', statuses: [], ingredient: '' },
+      batchesFiltersExpanded: false
     };
 
     var TABS = ['calculator', 'batches'];
@@ -2890,39 +3125,191 @@
       });
     }
 
+    // ---- Search + filter (SPEC §10.4.1 + §10.6) ----
+
+    function activeFilterCount() {
+      var f = state.batchesFilters;
+      var n = 0;
+      if (f.dateFrom || f.dateTo) n++;
+      if (f.statuses.length > 0 && f.statuses.length < 3) n++;
+      if (f.ingredient.trim() !== '') n++;
+      return n;
+    }
+
+    function anyFilteringActive() {
+      return state.batchesSearch.trim() !== '' || activeFilterCount() > 0;
+    }
+
+    function dateRangeInvalid() {
+      var f = state.batchesFilters;
+      return !!(f.dateFrom && f.dateTo && f.dateFrom > f.dateTo);
+    }
+
+    function batchMatches(batch, search, filters, settings) {
+      // Search: OR across name, ingredient names, notes (case-insensitive substring).
+      var s = (search || '').toLowerCase().trim();
+      if (s !== '') {
+        var inName = (batch.name || '').toLowerCase().indexOf(s) >= 0;
+        var inIng = (batch.ingredients || []).some(function (i) {
+          return (i && i.name || '').toLowerCase().indexOf(s) >= 0;
+        });
+        var inNotes = (batch.notes || '').toLowerCase().indexOf(s) >= 0;
+        if (!(inName || inIng || inNotes)) return false;
+      }
+      // Date range — date_made is ISO YYYY-MM-DD; lexicographic compare works.
+      if (filters.dateFrom && batch.date_made < filters.dateFrom) return false;
+      if (filters.dateTo && batch.date_made > filters.dateTo) return false;
+      // Status (only filters when 1 or 2 are selected; 0 or all = no filter).
+      if (filters.statuses.length > 0 && filters.statuses.length < 3) {
+        var m = computeMaturity(batch, settings);
+        if (filters.statuses.indexOf(m.status) < 0) return false;
+      }
+      // Ingredient: substring match against any ingredient name.
+      var ingF = (filters.ingredient || '').toLowerCase().trim();
+      if (ingF !== '') {
+        var hit = (batch.ingredients || []).some(function (i) {
+          return (i && i.name || '').toLowerCase().indexOf(ingF) >= 0;
+        });
+        if (!hit) return false;
+      }
+      return true;
+    }
+
+    function effectiveFilters() {
+      var f = state.batchesFilters;
+      // If date range is invalid (from > to), ignore the date filter; other
+      // filters still apply.
+      if (dateRangeInvalid()) {
+        return { dateFrom: '', dateTo: '', statuses: f.statuses, ingredient: f.ingredient };
+      }
+      return f;
+    }
+
+    function clearAllFilters() {
+      state.batchesFilters = { dateFrom: '', dateTo: '', statuses: [], ingredient: '' };
+      var df = document.getElementById('filter-date-from');
+      var dt = document.getElementById('filter-date-to');
+      if (df) df.value = '';
+      if (dt) dt.value = '';
+      document.querySelectorAll('[data-filter-status]').forEach(function (cb) { cb.checked = false; });
+      var ing = document.getElementById('filter-ingredient');
+      if (ing) ing.value = '';
+      renderBatchesTab();
+    }
+
+    function clearSearchAndFilters() {
+      var sIn = document.getElementById('batches-search');
+      var sClear = document.getElementById('batches-search-clear');
+      state.batchesSearch = '';
+      if (sIn) sIn.value = '';
+      if (sClear) sClear.hidden = true;
+      clearAllFilters();
+    }
+
     function renderBatchesTab() {
       var batches = (state.data && state.data.batches) || [];
       var hasAny = batches.length > 0;
+      var searchWrap = document.getElementById('batches-search-wrap');
+      var filtersHeader = document.getElementById('batches-filters-header');
+      var filtersPanel = document.getElementById('batches-filters-panel');
       var controls = document.getElementById('batches-controls');
       var dash = document.getElementById('batches-dashboard');
       var tableWrap = document.getElementById('batches-table-wrap');
       var emptyState = document.getElementById('batches-empty-state');
-      controls.hidden = !hasAny;
+      var filteredCount = document.getElementById('batches-filtered-count');
+      var filteredEmpty = document.getElementById('batches-filtered-empty');
+
+      // Whole-list empty state takes precedence regardless of filter input.
       if (!hasAny) {
+        searchWrap.hidden = true;
+        filtersHeader.hidden = true;
+        filtersPanel.hidden = true;
+        controls.hidden = true;
         dash.hidden = true;
         tableWrap.hidden = true;
+        filteredCount.hidden = true;
+        filteredEmpty.hidden = true;
         emptyState.hidden = false;
         return;
       }
       emptyState.hidden = true;
-      // Update view-toggle pressed state from current state
+      searchWrap.hidden = false;
+      filtersHeader.hidden = false;
+      filtersPanel.hidden = !state.batchesFiltersExpanded;
+      controls.hidden = false;
+
+      // Filters disclosure: caret + active count + inline Clear-filters.
+      var toggleEl = document.getElementById('filters-toggle');
+      toggleEl.setAttribute('aria-expanded', state.batchesFiltersExpanded ? 'true' : 'false');
+      toggleEl.querySelector('.caret').textContent = state.batchesFiltersExpanded ? '▾' : '▸';
+      var fc = activeFilterCount();
+      var fcBadge = document.getElementById('filters-active-count');
+      if (fc > 0) {
+        fcBadge.hidden = false;
+        fcBadge.textContent = '(' + fc + ')';
+      } else {
+        fcBadge.hidden = true;
+        fcBadge.textContent = '';
+      }
+      document.getElementById('filters-header-clear').hidden = (fc === 0);
+
+      // Date range invalid → show inline error + mark both inputs.
+      var dateErr = document.getElementById('filter-date-error');
+      var df = document.getElementById('filter-date-from');
+      var dt = document.getElementById('filter-date-to');
+      if (dateRangeInvalid()) {
+        dateErr.hidden = false;
+        df.classList.add('invalid');
+        dt.classList.add('invalid');
+      } else {
+        dateErr.hidden = true;
+        df.classList.remove('invalid');
+        dt.classList.remove('invalid');
+      }
+
+      // Update view-toggle pressed state from current state.
       document.querySelectorAll('[data-batches-view]').forEach(function (b) {
         b.setAttribute('aria-pressed', b.dataset.batchesView === state.batchesView ? 'true' : 'false');
       });
+
       var settings = (state.data && state.data.settings) || {};
-      var rows = batches.map(function (b) {
+      var allRows = batches.map(function (b) {
         return { batch: b, maturity: computeMaturity(b, settings) };
       });
+      var filters = effectiveFilters();
+      var filteredRows = allRows.filter(function (r) {
+        return batchMatches(r.batch, state.batchesSearch, filters, settings);
+      });
+
+      // "Showing N of M batches" — only when filtering is actually trimming.
+      if (anyFilteringActive() && filteredRows.length !== allRows.length) {
+        filteredCount.hidden = false;
+        filteredCount.textContent = 'Showing ' + filteredRows.length + ' of ' + allRows.length + ' batches';
+      } else {
+        filteredCount.hidden = true;
+        filteredCount.textContent = '';
+      }
+
+      // Filtered-empty state replaces the list when there are 0 matches,
+      // but search/filters/controls stay visible above it.
+      if (filteredRows.length === 0) {
+        dash.hidden = true;
+        tableWrap.hidden = true;
+        filteredEmpty.hidden = false;
+        return;
+      }
+      filteredEmpty.hidden = true;
+
       if (state.batchesView === 'table') {
         dash.hidden = true;
         tableWrap.hidden = false;
-        sortBatchesByColumn(rows, state.batchesSort.column, state.batchesSort.direction);
-        renderBatchesTable(rows);
+        sortBatchesByColumn(filteredRows, state.batchesSort.column, state.batchesSort.direction);
+        renderBatchesTable(filteredRows);
       } else {
         tableWrap.hidden = true;
         dash.hidden = false;
-        sortBatchesByColumn(rows, 'date_made', 'desc');
-        renderBatchesDashboard(rows);
+        sortBatchesByColumn(filteredRows, 'date_made', 'desc');
+        renderBatchesDashboard(filteredRows);
       }
     }
 
@@ -3792,6 +4179,56 @@
       });
       document.querySelectorAll('#batches-table-wrap thead th[data-batches-sort]').forEach(function (th) {
         th.addEventListener('click', onBatchesHeaderClick);
+      });
+
+      // Batches tab: search + filters
+      var searchIn = document.getElementById('batches-search');
+      var searchClear = document.getElementById('batches-search-clear');
+      searchIn.addEventListener('input', function () {
+        state.batchesSearch = searchIn.value;
+        searchClear.hidden = searchIn.value === '';
+        renderBatchesTab();
+      });
+      searchClear.addEventListener('click', function () {
+        searchIn.value = '';
+        state.batchesSearch = '';
+        searchClear.hidden = true;
+        renderBatchesTab();
+        searchIn.focus();
+      });
+      document.getElementById('filters-toggle').addEventListener('click', function () {
+        state.batchesFiltersExpanded = !state.batchesFiltersExpanded;
+        renderBatchesTab();
+      });
+      document.getElementById('filter-date-from').addEventListener('input', function () {
+        state.batchesFilters.dateFrom = this.value;
+        renderBatchesTab();
+      });
+      document.getElementById('filter-date-to').addEventListener('input', function () {
+        state.batchesFilters.dateTo = this.value;
+        renderBatchesTab();
+      });
+      document.querySelectorAll('[data-filter-status]').forEach(function (cb) {
+        cb.addEventListener('change', function () {
+          var s = cb.dataset.filterStatus;
+          var arr = state.batchesFilters.statuses;
+          if (cb.checked) {
+            if (arr.indexOf(s) < 0) arr.push(s);
+          } else {
+            state.batchesFilters.statuses = arr.filter(function (x) { return x !== s; });
+          }
+          renderBatchesTab();
+        });
+      });
+      document.getElementById('filter-ingredient').addEventListener('input', function () {
+        state.batchesFilters.ingredient = this.value;
+        renderBatchesTab();
+      });
+      document.querySelectorAll('[data-clear-filters]').forEach(function (b) {
+        b.addEventListener('click', clearAllFilters);
+      });
+      document.querySelectorAll('[data-clear-search-and-filters]').forEach(function (b) {
+        b.addEventListener('click', clearSearchAndFilters);
       });
 
       document.querySelectorAll('.tab-strip .tab').forEach(function (btn) {
