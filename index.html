@@ -69,6 +69,51 @@
       min-height: auto;
     }
 
+    /* --- Tab strip (SPEC §10.4) --- */
+    .tab-strip {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin: 0 0 18px;
+    }
+    .tab-strip .tab {
+      padding: 10px 18px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      touch-action: manipulation;
+      min-height: 44px;
+    }
+    .tab-strip .tab:hover { color: var(--fg); }
+    .tab-strip .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .tab-panel[hidden] { display: none; }
+
+    /* --- Empty state (matches Load Recipe modal's empty state) --- */
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 64px 12px;
+    }
+    .empty-state-title {
+      margin: 0 0 6px;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .empty-state-sub {
+      margin: 0;
+      font-size: 15px;
+    }
+
     /* --- Section blocks --- */
     .section {
       margin: 0 0 20px;
@@ -400,6 +445,18 @@
       color: var(--muted);
       cursor: not-allowed;
     }
+    .settings-field.with-help { align-items: start; }
+    .settings-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .settings-help {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
     .settings-actions {
       display: flex;
       gap: 10px;
@@ -635,6 +692,7 @@
 
       /* Hide all app chrome */
       .view-header,
+      .tab-strip,
       .presets-section,
       .recipe-action-bar,
       .toggles-row,
@@ -643,6 +701,7 @@
       .toast,
       .modal-backdrop,
       #settings-view,
+      #batches-panel,
       th.col-check,
       td.check-cell {
         display: none !important;
@@ -827,6 +886,13 @@
       </div>
       <p id="status" class="status">Loading factors&hellip;</p>
 
+      <nav class="tab-strip" role="tablist" aria-label="Main sections">
+        <button type="button" class="tab active" role="tab" data-tab="calculator" id="tab-calculator" aria-selected="true" aria-controls="calculator-panel">Calculator</button>
+        <button type="button" class="tab" role="tab" data-tab="batches" id="tab-batches" aria-selected="false" aria-controls="batches-panel">Batches</button>
+      </nav>
+
+      <div id="calculator-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-calculator">
+
       <section class="section presets-section" aria-labelledby="presets-label">
         <span id="presets-label" class="section-label">Lard presets</span>
         <div class="presets" role="group" aria-label="Lard presets">
@@ -954,6 +1020,15 @@
         <h2 class="print-section-label">Notes</h2>
         <div id="print-notes-content" class="print-notes-content"></div>
       </section>
+
+      </div><!-- /#calculator-panel -->
+
+      <div id="batches-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-batches" hidden>
+        <div class="empty-state">
+          <p class="empty-state-title">No batches yet</p>
+          <p class="empty-state-sub">Batches you make will appear here</p>
+        </div>
+      </div>
     </section>
 
     <section id="settings-view" class="view" hidden>
@@ -1012,6 +1087,13 @@
               <button type="button" data-settings-eo="light" aria-pressed="false">Light</button>
             </div>
           </div>
+          <label class="settings-field with-help">
+            <span class="settings-label">Default cure time (days)</span>
+            <div class="settings-input-group">
+              <input class="settings-input" data-settings-cure-time type="number" min="1" step="1" inputmode="numeric" autocomplete="off">
+              <p class="settings-help">Most soap cures in 4&ndash;6 weeks (28&ndash;42 days). Individual batches can override this.</p>
+            </div>
+          </label>
         </div>
       </section>
 
@@ -1041,7 +1123,7 @@
       essential_oil_heavy: 0.06097560975609760,
       essential_oil_light: 0.03658536585
     };
-    var DEFAULT_SETTINGS = { default_unit: 'g', default_eo_type: 'heavy' };
+    var DEFAULT_SETTINGS = { default_unit: 'g', default_eo_type: 'heavy', default_cure_time_days: 35 };
 
     var INGREDIENT_FIELDS = ['lard', 'coconut_oil', 'lye', 'water', 'essential_oil'];
 
@@ -1053,9 +1135,12 @@
       anchorField: 'lard',
       anchorWeightG: null,
       view: 'main',
+      tab: 'calculator',
       measuring: false,
       loadedRecipeId: null
     };
+
+    var TABS = ['calculator', 'batches'];
 
     var statusEl = document.getElementById('status');
     var settingsStatusEl = document.getElementById('settings-status');
@@ -1255,6 +1340,41 @@
       }, durationMs || 2000);
     }
 
+    // ---- tabs (SPEC §10.4) ----
+
+    function tabFromHash() {
+      var h = (location.hash || '').replace(/^#/, '');
+      return TABS.indexOf(h) >= 0 ? h : 'calculator';
+    }
+
+    function applyTab(name) {
+      if (TABS.indexOf(name) < 0) name = 'calculator';
+      state.tab = name;
+      document.getElementById('calculator-panel').hidden = (name !== 'calculator');
+      document.getElementById('batches-panel').hidden = (name !== 'batches');
+      document.querySelectorAll('.tab-strip .tab').forEach(function (btn) {
+        var active = btn.dataset.tab === name;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    }
+
+    function setTab(name) {
+      if (TABS.indexOf(name) < 0) name = 'calculator';
+      if (state.tab === name && location.hash.replace(/^#/, '') === name) return;
+      // Updating the hash fires hashchange, which calls applyTab.
+      // Update directly first so the click feels instant even if hashchange
+      // is delayed by browser quirks.
+      applyTab(name);
+      if (location.hash.replace(/^#/, '') !== name) {
+        location.hash = '#' + name;
+      }
+    }
+
+    function onHashChange() {
+      applyTab(tabFromHash());
+    }
+
     // ---- views ----
 
     function showView(name) {
@@ -1295,12 +1415,18 @@
       });
       var unit = (settings && settings.default_unit) || 'g';
       var eo = (settings && settings.default_eo_type) || 'heavy';
+      var cureDays = (settings && settings.default_cure_time_days != null)
+        ? settings.default_cure_time_days
+        : 35;
       document.querySelectorAll('[data-settings-unit]').forEach(function (b) {
         b.setAttribute('aria-pressed', b.dataset.settingsUnit === unit ? 'true' : 'false');
       });
       document.querySelectorAll('[data-settings-eo]').forEach(function (b) {
         b.setAttribute('aria-pressed', b.dataset.settingsEo === eo ? 'true' : 'false');
       });
+      var cureInput = document.querySelector('[data-settings-cure-time]');
+      cureInput.value = String(cureDays);
+      cureInput.classList.remove('invalid');
     }
 
     function settingsReset() {
@@ -1338,6 +1464,17 @@
         return;
       }
 
+      var cureInput = document.querySelector('[data-settings-cure-time]');
+      var cureRaw = cureInput.value.trim();
+      var cureNum = Number(cureRaw);
+      cureInput.classList.remove('invalid');
+      if (cureRaw === '' || !isFinite(cureNum) || !Number.isInteger(cureNum) || cureNum <= 0) {
+        cureInput.classList.add('invalid');
+        settingsStatusEl.className = 'status error';
+        settingsStatusEl.textContent = 'Default cure time must be a positive whole number of days.';
+        return;
+      }
+
       var newUnit = document.querySelector('[data-settings-unit][aria-pressed="true"]').dataset.settingsUnit;
       var newEo = document.querySelector('[data-settings-eo][aria-pressed="true"]').dataset.settingsEo;
 
@@ -1345,6 +1482,7 @@
       newData.factor_sets.default = newFactors;
       newData.settings.default_unit = newUnit;
       newData.settings.default_eo_type = newEo;
+      newData.settings.default_cure_time_days = cureNum;
 
       settingsStatusEl.className = 'status';
       settingsStatusEl.textContent = 'Saving…';
@@ -1857,6 +1995,10 @@
       document.querySelector('[data-save-modal-cancel]').addEventListener('click', closeSaveModal);
       document.querySelector('[data-save-modal-confirm]').addEventListener('click', saveRecipeFromModal);
       document.querySelector('[data-load-modal-close]').addEventListener('click', closeLoadModal);
+      document.querySelectorAll('.tab-strip .tab').forEach(function (btn) {
+        btn.addEventListener('click', function () { setTab(btn.dataset.tab); });
+      });
+      window.addEventListener('hashchange', onHashChange);
       document.addEventListener('visibilitychange', onVisibilityChange);
     }
 
@@ -1895,6 +2037,7 @@
         .then(function (data) {
           applyDataFromServer(data);
           wireEvents();
+          applyTab(tabFromHash());
           statusEl.textContent = '';
         })
         .catch(function (err) {

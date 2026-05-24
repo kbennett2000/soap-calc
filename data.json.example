@@ -12,7 +12,9 @@
   },
   "settings": {
     "default_unit": "g",
-    "default_eo_type": "heavy"
+    "default_eo_type": "heavy",
+    "default_cure_time_days": 35
   },
-  "recipes": []
+  "recipes": [],
+  "batches": []
 }

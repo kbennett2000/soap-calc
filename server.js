@@ -35,6 +35,48 @@ function ensureDataFile() {
   logInfo('initialized new data file at ' + DATA_FILE);
 }
 
+// SPEC §10.2: add `batches` and `settings.default_cure_time_days` to existing
+// data files that predate the Soap Log feature. Idempotent.
+function migrateDataFile() {
+  let raw;
+  try {
+    raw = fs.readFileSync(DATA_FILE, 'utf8');
+  } catch (err) {
+    logError('migration: failed to read data file', err);
+    return;
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    logError('migration: data file is not valid JSON, skipping', err);
+    return;
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    logError('migration: data file root is not a JSON object, skipping', null);
+    return;
+  }
+  const changes = [];
+  if (!Object.prototype.hasOwnProperty.call(parsed, 'batches') || !Array.isArray(parsed.batches)) {
+    parsed.batches = [];
+    changes.push('batches');
+  }
+  if (!parsed.settings || typeof parsed.settings !== 'object') {
+    parsed.settings = {};
+    changes.push('settings');
+  }
+  if (!Object.prototype.hasOwnProperty.call(parsed.settings, 'default_cure_time_days')) {
+    parsed.settings.default_cure_time_days = 35;
+    changes.push('settings.default_cure_time_days');
+  }
+  if (changes.length === 0) return;
+  const tmp = DATA_FILE + '.tmp';
+  const serialized = JSON.stringify(parsed, null, 2) + '\n';
+  fs.writeFileSync(tmp, serialized);
+  fs.renameSync(tmp, DATA_FILE);
+  logInfo('migrated data file: added ' + changes.join(', '));
+}
+
 function sendJson(res, status, payload) {
   const body = Buffer.from(JSON.stringify(payload));
   res.writeHead(status, {
@@ -186,6 +228,7 @@ server.on('error', (err) => {
 
 try {
   ensureDataFile();
+  migrateDataFile();
 } catch (err) {
   logError('failed to initialize data file', err);
   process.exit(1);
