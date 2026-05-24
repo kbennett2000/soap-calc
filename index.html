@@ -21,6 +21,13 @@
       --flash: #fff4c2;
       --error: #b91c1c;
       --error-soft: #fde2e2;
+      /* Batch maturity status palette (SPEC §10.3) */
+      --status-curing: #1d4ed8;
+      --status-curing-soft: #dbe7ff;
+      --status-ready: #15803d;
+      --status-ready-soft: #dcfce7;
+      --status-mature: #6b8a76;
+      --status-mature-soft: #e7ede9;
     }
 
     * { box-sizing: border-box; }
@@ -705,11 +712,200 @@
     .override-row .hint { font-size: 14px; color: var(--muted); }
     .btn-small { min-height: 40px; padding: 0 12px; font-size: 14px; }
 
-    /* Batches tab: empty state with the temporary New batch button */
-    .batches-empty .new-batch-row {
+    /* Batches tab (SPEC §10.4) — shared atoms used by list, table, detail */
+    .batch-progress-bar {
+      height: 8px;
+      background: var(--toggle-bg);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .batch-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 220ms ease-out;
+    }
+    .batch-progress-fill.curing { background: var(--status-curing); }
+    .batch-progress-fill.ready  { background: var(--status-ready); }
+    .batch-progress-fill.mature { background: var(--status-mature); }
+
+    .batch-status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .batch-status-badge.curing { background: var(--status-curing-soft); color: var(--status-curing); }
+    .batch-status-badge.ready  { background: var(--status-ready-soft);  color: var(--status-ready); }
+    .batch-status-badge.mature { background: var(--status-mature-soft); color: #485d4f; }
+
+    /* Controls row: view toggle + New batch button (visible when batches exist) */
+    .batches-controls {
       display: flex;
-      justify-content: flex-end;
-      margin-bottom: 24px;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 14px;
+    }
+    .batches-controls .toggle { margin-right: auto; }
+    .batches-controls .toggle button { min-height: 38px; padding: 0 14px; font-size: 14px; }
+    .batches-controls .btn { min-height: 44px; }
+
+    /* Dashboard cards */
+    .batch-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .batch-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      background: var(--bg);
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .batch-card:hover { border-color: var(--accent); }
+    .batch-card:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .batch-card-head {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .batch-card-name {
+      font-size: 17px;
+      font-weight: 600;
+      flex: 1;
+      min-width: 0;
+      word-break: break-word;
+    }
+    .batch-card-date {
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .batch-card-progress-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 0;
+    }
+    .batch-card-progress-row .batch-progress-bar { flex: 1; }
+    .batch-card-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .batch-card-meta.italic { font-style: italic; }
+    .batch-card-notes {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    /* Phone-only secondary line: "date · badge" */
+    .batch-card-meta-line { display: none; }
+
+    /* Table view */
+    .batches-table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    table.batches-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      table-layout: fixed;
+    }
+    .batches-table col.col-name   { width: auto; }
+    .batches-table col.col-date   { width: 130px; }
+    .batches-table col.col-status { width: 110px; }
+    .batches-table col.col-ing    { width: 130px; }
+    .batches-table col.col-notes  { width: 180px; }
+    .batches-table th, .batches-table td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .batches-table thead th {
+      background: #f1f3f5;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .batches-table thead th:hover { background: #e6e9ed; }
+    .batches-table thead th.sort-asc::after { content: " \2191"; color: var(--accent); }
+    .batches-table thead th.sort-desc::after { content: " \2193"; color: var(--accent); }
+    .batches-table tbody tr {
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .batches-table tbody tr:hover { background: #f9fafb; }
+    .batches-table tbody tr:last-child td { border-bottom: 0; }
+    .batches-table td.name {
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .batches-table td.notes {
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .batches-table td.empty-cell {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* Empty-state in the Batches tab */
+    .batches-empty .empty-state-action {
+      margin-top: 16px;
+    }
+
+    /* Phone layout: collapse desktop card chrome to a tighter stack.
+       Threshold matches SPEC §10.4.2 ("Phone layout (< ~720px viewport)"). */
+    @media (max-width: 719px) {
+      .batch-card-head .batch-card-date { display: none; }
+      .batch-card-progress-row { margin: 0 0 8px; }
+      .batch-card-progress-row .batch-status-badge { display: none; }
+      .batch-card-meta-line {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--muted);
+        margin: 2px 0 10px;
+      }
+      .batch-card-meta-line .sep { color: var(--muted); }
+      .batch-card-notes { -webkit-line-clamp: 2; }
+
+      /* Tighter table at narrow viewports; drop Notes column at phone width. */
+      .batches-table col.col-date   { width: 100px; }
+      .batches-table col.col-status { width: 92px; }
+      .batches-table col.col-ing    { width: 92px; }
+      .batches-table col.col-notes  { width: 0; }
+      .batches-table th.col-notes-h, .batches-table td.col-notes-c { display: none; }
+      .batches-table th, .batches-table td { padding: 8px 6px; font-size: 13px; }
     }
 
     /* Batch detail view (SPEC §10.5.3) */
@@ -775,27 +971,7 @@
     .detail-progress-row {
       margin: 8px 0;
     }
-    .detail-progress-bar {
-      height: 8px;
-      background: var(--toggle-bg);
-      border-radius: 999px;
-      overflow: hidden;
-      margin: 0 0 8px;
-    }
-    .detail-progress-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: var(--accent);
-    }
-    .detail-status-badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 600;
-      background: var(--accent-soft);
-      color: var(--accent);
-    }
+    .detail-progress-row .batch-progress-bar { margin: 0 0 8px; }
     .detail-section {
       margin: 18px 0;
     }
@@ -1255,10 +1431,9 @@
         </div>
         <div class="detail-date" id="detail-date"></div>
 
-        <!-- TODO: replace with real maturity calc in next session -->
         <div class="detail-progress-row">
-          <div class="detail-progress-bar"><div class="detail-progress-fill" style="width: 50%"></div></div>
-          <span class="detail-status-badge">Curing</span>
+          <div class="batch-progress-bar"><div class="batch-progress-fill curing" id="detail-progress-fill" style="width: 0%"></div></div>
+          <span class="batch-status-badge curing" id="detail-status-badge"></span>
         </div>
 
         <div class="detail-section">
@@ -1460,13 +1635,47 @@
       </div><!-- /#calculator-panel -->
 
       <div id="batches-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-batches" hidden>
-        <div class="batches-empty">
-          <div class="new-batch-row">
-            <button type="button" class="btn btn-primary" data-new-batch>+ New batch</button>
+        <div class="batches-controls" id="batches-controls" hidden>
+          <div class="toggle" role="group" aria-label="View mode">
+            <button type="button" data-batches-view="table" aria-pressed="false">Table</button>
+            <button type="button" data-batches-view="dashboard" aria-pressed="true">Dashboard</button>
           </div>
+          <button type="button" class="btn btn-primary" data-new-batch>+ New batch</button>
+        </div>
+
+        <!-- TODO: search + filters in next session -->
+
+        <div id="batches-dashboard" class="batch-list" hidden></div>
+
+        <div id="batches-table-wrap" class="batches-table-wrap" hidden>
+          <table class="batches-table">
+            <colgroup>
+              <col class="col-name">
+              <col class="col-date">
+              <col class="col-status">
+              <col class="col-ing">
+              <col class="col-notes">
+            </colgroup>
+            <thead>
+              <tr>
+                <th data-batches-sort="name">Name</th>
+                <th data-batches-sort="date_made">Date made</th>
+                <th data-batches-sort="status">Status</th>
+                <th data-batches-sort="ingredients">Ingredients</th>
+                <th class="col-notes-h" data-batches-sort="notes">Notes</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div id="batches-empty-state" class="batches-empty" hidden>
           <div class="empty-state">
             <p class="empty-state-title">No batches yet</p>
             <p class="empty-state-sub">Batches you make will appear here</p>
+            <div class="empty-state-action">
+              <button type="button" class="btn btn-primary" data-new-batch>+ New batch</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1579,10 +1788,16 @@
       tab: 'calculator',
       measuring: false,
       loadedRecipeId: null,
-      detailBatchId: null
+      detailBatchId: null,
+      batchesView: 'dashboard',
+      batchesSort: { column: 'date_made', direction: 'desc' }
     };
 
     var TABS = ['calculator', 'batches'];
+    var BATCHES_VIEW_KEY = 'soapcalc.batches_view_mode';
+    var BATCHES_SORT_KEY = 'soapcalc.batches_sort';
+    var VALID_SORT_COLUMNS = ['name', 'date_made', 'status', 'ingredients', 'notes'];
+    var STATUS_ORDER = { curing: 0, ready: 1, mature: 2 };
 
     var INGREDIENT_LABELS = {
       lard: 'Lard',
@@ -1978,6 +2193,9 @@
         state.factors = newData.factor_sets.default;
         renderFactorCells();
         if (state.anchorWeightG != null) renderAllInputs(state.anchorField);
+        // default_cure_time_days may have changed — re-render batches in case
+        // a status flipped under it.
+        renderBatchesTab();
         showView('main');
         showToast('Settings saved');
       }).catch(function (err) {
@@ -2012,6 +2230,13 @@
           var beforeDisplay = factorsDiffer ? captureDisplay() : null;
           state.data = fresh;
           state.factors = freshSet;
+          // Batches list and detail view should pick up additions/edits
+          // from another device on focus (SPEC §10.9).
+          renderBatchesTab();
+          if (state.detailBatchId) {
+            var b = findBatch(state.detailBatchId);
+            if (b) renderBatchDetail(b);
+          }
           if (!factorsDiffer) return;
           renderFactorCells();
           if (state.anchorWeightG != null) {
@@ -2027,6 +2252,14 @@
 
     function onVisibilityChange() {
       if (document.visibilityState === 'visible' && state.view === 'main') {
+        // Re-render now to pick up any local-date rollover (e.g., a batch
+        // that crossed from Curing to Ready overnight); refresh then runs
+        // async to also absorb any server-side changes (SPEC §10.5 Part 5).
+        renderBatchesTab();
+        if (state.detailBatchId) {
+          var b = findBatch(state.detailBatchId);
+          if (b) renderBatchDetail(b);
+        }
         refreshFactorsIfChanged();
       }
     }
@@ -2510,6 +2743,7 @@
           });
         }
         state.data = newData;
+        renderBatchesTab();
         return updated;
       });
     }
@@ -2528,7 +2762,324 @@
           });
         }
         state.data = newData;
+        renderBatchesTab();
       });
+    }
+
+    // ---- Maturity (SPEC §10.3) ----
+    //
+    // Today is the user's browser local date at midnight, NOT the server's
+    // clock. We convert both ends to UTC-day integers to avoid DST drift
+    // when subtracting (DST changes pad/shrink local-time differences by
+    // an hour, which would otherwise flip the floor result on the wrong
+    // day).
+    function todayLocalYmdAsUtcDay() {
+      var d = new Date();
+      return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+    }
+    function isoDateAsUtcDay(iso) {
+      if (!iso) return null;
+      var p = String(iso).split('-');
+      if (p.length !== 3) return null;
+      var y = Number(p[0]), m = Number(p[1]) - 1, day = Number(p[2]);
+      if (!isFinite(y) || !isFinite(m) || !isFinite(day)) return null;
+      return Math.floor(Date.UTC(y, m, day) / 86400000);
+    }
+
+    function computeMaturity(batch, settings) {
+      var cure = (batch && batch.cure_time_days_override != null)
+        ? batch.cure_time_days_override
+        : ((settings && settings.default_cure_time_days != null) ? settings.default_cure_time_days : 35);
+      if (cure <= 0) cure = 35; // defensive; upstream validation should prevent this
+      var made = isoDateAsUtcDay(batch && batch.date_made);
+      var today = todayLocalYmdAsUtcDay();
+      if (made == null) {
+        return { status: 'curing', days_elapsed: 0, progress: 0, days_until_ready: cure, days_past_ready: 0 };
+      }
+      var elapsed = today - made;
+      var progress = elapsed <= 0 ? 0 : Math.min(1, elapsed / cure);
+      var status;
+      if (elapsed < cure) status = 'curing';
+      else if (elapsed - cure <= 14) status = 'ready';
+      else status = 'mature';
+      return {
+        status: status,
+        days_elapsed: elapsed,
+        progress: progress,
+        days_until_ready: Math.max(0, cure - elapsed),
+        days_past_ready: Math.max(0, elapsed - cure)
+      };
+    }
+
+    function pluralDays(n) {
+      return n + ' day' + (n === 1 ? '' : 's');
+    }
+
+    function statusBadgeLabel(maturity) {
+      if (maturity.status === 'ready') return 'Ready! • ' + pluralDays(maturity.days_past_ready) + ' ago';
+      if (maturity.status === 'mature') return 'Mature';
+      // curing: count from 0 even if days_elapsed is negative (future-dated batch)
+      var n = Math.max(0, maturity.days_elapsed);
+      return 'Curing • ' + pluralDays(n);
+    }
+
+    function ingredientSummary(batch) {
+      var list = (batch && batch.ingredients) || [];
+      if (list.length === 0) return { text: '(no ingredients recorded)', italic: true };
+      var total = 0;
+      for (var i = 0; i < list.length; i++) {
+        if (list[i] && typeof list[i].weight_g === 'number' && isFinite(list[i].weight_g)) {
+          total += list[i].weight_g;
+        }
+      }
+      var count = list.length;
+      var label = count + ' ingredient' + (count === 1 ? '' : 's');
+      return { text: label + ', ' + Math.round(total) + ' g total', italic: false };
+    }
+
+    function batchesViewLoad() {
+      try {
+        var raw = localStorage.getItem(BATCHES_VIEW_KEY);
+        if (raw === 'table' || raw === 'dashboard') state.batchesView = raw;
+      } catch (e) { /* localStorage unavailable: keep default */ }
+      try {
+        var rawSort = localStorage.getItem(BATCHES_SORT_KEY);
+        if (rawSort) {
+          var s = JSON.parse(rawSort);
+          if (s && VALID_SORT_COLUMNS.indexOf(s.column) >= 0 && (s.direction === 'asc' || s.direction === 'desc')) {
+            state.batchesSort = { column: s.column, direction: s.direction };
+          }
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    function batchesViewSave() {
+      try { localStorage.setItem(BATCHES_VIEW_KEY, state.batchesView); } catch (e) {}
+    }
+    function batchesSortSave() {
+      try { localStorage.setItem(BATCHES_SORT_KEY, JSON.stringify(state.batchesSort)); } catch (e) {}
+    }
+
+    function setBatchesView(name) {
+      if (name !== 'table' && name !== 'dashboard') return;
+      if (state.batchesView === name) return;
+      state.batchesView = name;
+      batchesViewSave();
+      renderBatchesTab();
+    }
+
+    function sortBatchesByColumn(rows, column, direction) {
+      var sign = direction === 'asc' ? 1 : -1;
+      var key;
+      if (column === 'name') key = function (r) { return (r.batch.name || '').toLowerCase(); };
+      else if (column === 'date_made') key = function (r) { return r.batch.date_made || ''; };
+      else if (column === 'status') key = function (r) { return STATUS_ORDER[r.maturity.status] || 0; };
+      else if (column === 'ingredients') key = function (r) { return (r.batch.ingredients || []).length; };
+      else if (column === 'notes') key = function (r) { return (r.batch.notes || '').toLowerCase(); };
+      else key = function (r) { return r.batch.date_made || ''; };
+      // tie-break by created_at to keep stable ordering
+      rows.sort(function (a, b) {
+        var ak = key(a), bk = key(b);
+        if (ak < bk) return -1 * sign;
+        if (ak > bk) return 1 * sign;
+        var ac = a.batch.created_at || '';
+        var bc = b.batch.created_at || '';
+        if (ac < bc) return 1;
+        if (ac > bc) return -1;
+        return 0;
+      });
+    }
+
+    function renderBatchesTab() {
+      var batches = (state.data && state.data.batches) || [];
+      var hasAny = batches.length > 0;
+      var controls = document.getElementById('batches-controls');
+      var dash = document.getElementById('batches-dashboard');
+      var tableWrap = document.getElementById('batches-table-wrap');
+      var emptyState = document.getElementById('batches-empty-state');
+      controls.hidden = !hasAny;
+      if (!hasAny) {
+        dash.hidden = true;
+        tableWrap.hidden = true;
+        emptyState.hidden = false;
+        return;
+      }
+      emptyState.hidden = true;
+      // Update view-toggle pressed state from current state
+      document.querySelectorAll('[data-batches-view]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.dataset.batchesView === state.batchesView ? 'true' : 'false');
+      });
+      var settings = (state.data && state.data.settings) || {};
+      var rows = batches.map(function (b) {
+        return { batch: b, maturity: computeMaturity(b, settings) };
+      });
+      if (state.batchesView === 'table') {
+        dash.hidden = true;
+        tableWrap.hidden = false;
+        sortBatchesByColumn(rows, state.batchesSort.column, state.batchesSort.direction);
+        renderBatchesTable(rows);
+      } else {
+        tableWrap.hidden = true;
+        dash.hidden = false;
+        sortBatchesByColumn(rows, 'date_made', 'desc');
+        renderBatchesDashboard(rows);
+      }
+    }
+
+    function renderBatchesDashboard(rows) {
+      var dash = document.getElementById('batches-dashboard');
+      dash.innerHTML = '';
+      rows.forEach(function (r) {
+        dash.appendChild(buildBatchCard(r));
+      });
+    }
+
+    function buildBatchCard(row) {
+      var batch = row.batch;
+      var m = row.maturity;
+      var card = document.createElement('div');
+      card.className = 'batch-card';
+      card.dataset.batchId = batch.id;
+      card.setAttribute('role', 'button');
+      card.tabIndex = 0;
+      card.addEventListener('click', function () { location.hash = '#batches/' + batch.id; });
+      card.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          location.hash = '#batches/' + batch.id;
+        }
+      });
+
+      var head = document.createElement('div');
+      head.className = 'batch-card-head';
+      var name = document.createElement('div');
+      name.className = 'batch-card-name';
+      name.textContent = batch.name;
+      var date = document.createElement('div');
+      date.className = 'batch-card-date';
+      date.textContent = longDateLabel(batch.date_made);
+      head.appendChild(name);
+      head.appendChild(date);
+      card.appendChild(head);
+
+      // Phone-only secondary line: date · status badge
+      var phoneLine = document.createElement('div');
+      phoneLine.className = 'batch-card-meta-line';
+      var phoneDate = document.createElement('span');
+      phoneDate.textContent = longDateLabel(batch.date_made);
+      var sep = document.createElement('span');
+      sep.className = 'sep';
+      sep.textContent = '·';
+      var phoneBadge = document.createElement('span');
+      phoneBadge.className = 'batch-status-badge ' + m.status;
+      phoneBadge.textContent = statusBadgeLabel(m);
+      phoneLine.appendChild(phoneDate);
+      phoneLine.appendChild(sep);
+      phoneLine.appendChild(phoneBadge);
+      card.appendChild(phoneLine);
+
+      var progRow = document.createElement('div');
+      progRow.className = 'batch-card-progress-row';
+      var bar = document.createElement('div');
+      bar.className = 'batch-progress-bar';
+      var fill = document.createElement('div');
+      fill.className = 'batch-progress-fill ' + m.status;
+      fill.style.width = (m.progress * 100).toFixed(1) + '%';
+      bar.appendChild(fill);
+      var deskBadge = document.createElement('span');
+      deskBadge.className = 'batch-status-badge ' + m.status;
+      deskBadge.textContent = statusBadgeLabel(m);
+      progRow.appendChild(bar);
+      progRow.appendChild(deskBadge);
+      card.appendChild(progRow);
+
+      var sum = ingredientSummary(batch);
+      var meta = document.createElement('div');
+      meta.className = 'batch-card-meta' + (sum.italic ? ' italic' : '');
+      meta.textContent = sum.text;
+      card.appendChild(meta);
+
+      var notesText = (batch.notes || '').trim();
+      if (notesText) {
+        var notes = document.createElement('div');
+        notes.className = 'batch-card-notes';
+        notes.textContent = notesText;
+        card.appendChild(notes);
+      }
+
+      return card;
+    }
+
+    function renderBatchesTable(rows) {
+      var tbody = document.querySelector('#batches-table-wrap tbody');
+      tbody.innerHTML = '';
+      // Update sort indicators on headers
+      var ths = document.querySelectorAll('#batches-table-wrap thead th[data-batches-sort]');
+      ths.forEach(function (th) {
+        th.classList.remove('sort-asc', 'sort-desc');
+        if (th.dataset.batchesSort === state.batchesSort.column) {
+          th.classList.add(state.batchesSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+        }
+      });
+
+      rows.forEach(function (r) {
+        var batch = r.batch;
+        var m = r.maturity;
+        var tr = document.createElement('tr');
+        tr.dataset.batchId = batch.id;
+        tr.addEventListener('click', function () { location.hash = '#batches/' + batch.id; });
+
+        var tdName = document.createElement('td');
+        tdName.className = 'name';
+        tdName.title = batch.name;
+        tdName.textContent = batch.name;
+        tr.appendChild(tdName);
+
+        var tdDate = document.createElement('td');
+        tdDate.textContent = longDateLabel(batch.date_made);
+        tr.appendChild(tdDate);
+
+        var tdStatus = document.createElement('td');
+        var badge = document.createElement('span');
+        badge.className = 'batch-status-badge ' + m.status;
+        badge.textContent = m.status === 'curing' ? 'Curing'
+          : m.status === 'ready' ? 'Ready'
+          : 'Mature';
+        tdStatus.appendChild(badge);
+        tr.appendChild(tdStatus);
+
+        var sum = ingredientSummary(batch);
+        var tdIng = document.createElement('td');
+        if (sum.italic) {
+          tdIng.className = 'empty-cell';
+          tdIng.textContent = '(none)';
+        } else {
+          tdIng.textContent = sum.text;
+        }
+        tr.appendChild(tdIng);
+
+        var tdNotes = document.createElement('td');
+        tdNotes.className = 'notes col-notes-c';
+        var notesText = (batch.notes || '').trim();
+        tdNotes.title = notesText;
+        tdNotes.textContent = notesText;
+        tr.appendChild(tdNotes);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function onBatchesHeaderClick(e) {
+      var th = e.currentTarget;
+      var col = th.dataset.batchesSort;
+      if (!col || VALID_SORT_COLUMNS.indexOf(col) < 0) return;
+      if (state.batchesSort.column === col) {
+        state.batchesSort.direction = state.batchesSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.batchesSort = { column: col, direction: 'asc' };
+      }
+      batchesSortSave();
+      renderBatchesTab();
     }
 
     function wireAdvancedToggle(toggleEl, panelEl, cbEl, daysEl) {
@@ -2672,6 +3223,7 @@
         return r.json();
       }).then(function () {
         state.data = newData;
+        renderBatchesTab();
         confirmBtn.disabled = false;
         closeStartBatchModal();
         showBatchToast('Batch started', true);
@@ -2868,6 +3420,7 @@
         return r.json();
       }).then(function () {
         state.data = newData;
+        renderBatchesTab();
         confirmBtn.disabled = false;
         closeNewBatchModal();
         showBatchToast('Batch saved', false);
@@ -2930,6 +3483,15 @@
 
       // Date made (read-only)
       document.getElementById('detail-date').textContent = 'Made ' + longDateLabel(batch.date_made);
+
+      // Maturity (badge + progress bar) — recomputed against today's local date
+      var maturity = computeMaturity(batch, (state.data && state.data.settings) || {});
+      var fillEl = document.getElementById('detail-progress-fill');
+      var badgeEl = document.getElementById('detail-status-badge');
+      fillEl.className = 'batch-progress-fill ' + maturity.status;
+      fillEl.style.width = (maturity.progress * 100).toFixed(1) + '%';
+      badgeEl.className = 'batch-status-badge ' + maturity.status;
+      badgeEl.textContent = statusBadgeLabel(maturity);
 
       // Ingredients (read-only)
       var ingContainer = document.getElementById('detail-ingredients-container');
@@ -3176,7 +3738,9 @@
       );
 
       // ---- batches: new (blank) ----
-      document.querySelector('[data-new-batch]').addEventListener('click', openNewBatchModal);
+      document.querySelectorAll('[data-new-batch]').forEach(function (b) {
+        b.addEventListener('click', openNewBatchModal);
+      });
       document.querySelector('[data-new-batch-cancel]').addEventListener('click', closeNewBatchModal);
       document.querySelector('[data-new-batch-confirm]').addEventListener('click', saveNewBatchFromModal);
       document.querySelector('[data-add-ingredient]').addEventListener('click', addNewBatchIngredientRow);
@@ -3222,6 +3786,14 @@
       });
       document.addEventListener('keydown', onGlobalKeydown);
 
+      // Batches tab: view toggle + sortable table headers
+      document.querySelectorAll('[data-batches-view]').forEach(function (b) {
+        b.addEventListener('click', function () { setBatchesView(b.dataset.batchesView); });
+      });
+      document.querySelectorAll('#batches-table-wrap thead th[data-batches-sort]').forEach(function (th) {
+        th.addEventListener('click', onBatchesHeaderClick);
+      });
+
       document.querySelectorAll('.tab-strip .tab').forEach(function (btn) {
         btn.addEventListener('click', function () { setTab(btn.dataset.tab); });
       });
@@ -3264,7 +3836,9 @@
         })
         .then(function (data) {
           applyDataFromServer(data);
+          batchesViewLoad();
           wireEvents();
+          renderBatchesTab();
           applyHashRoute();
           statusEl.textContent = '';
         })
