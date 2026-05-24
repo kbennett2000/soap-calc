@@ -277,6 +277,104 @@ each.
 
 ---
 
+## I can't find a batch I'm sure I saved
+
+**Symptom:** a batch you remember saving doesn't appear in the Batches
+list.
+
+### 1. A search or filter is hiding it
+
+The Batches tab has a search bar and a filters panel. If either is
+active, batches that don't match are hidden. Check:
+
+- Is there text in the search bar? Clear it (the **×** on the right
+  side of the search box).
+- Is the Filters label showing a count, like **▸ Filters (2)**? Expand
+  it and click **Clear filters**, or click the inline **Clear filters**
+  link in the collapsed view.
+
+The "Showing N of M batches" line above the list also tells you when
+filtering is hiding things — if N is smaller than M, something is being
+filtered out.
+
+### 2. You're on a different device or server
+
+Batches live on the specific server they were saved on. If you've set
+up the calculator on a new machine, the new install starts with zero
+batches. Same as recipes — see [I think I lost my saved recipes](#i-think-i-lost-my-saved-recipes)
+below for the full explanation.
+
+### 3. The data file got corrupted or reset
+
+Rare but possible. Check the server:
+
+```
+ls -la /var/lib/soapcalc/data.json
+```
+
+If the file is missing or 0 bytes, the service will recreate it empty
+the next time it starts. If you have a backup, restore it (see
+[I think I lost my saved recipes](#i-think-i-lost-my-saved-recipes)
+for the restore steps).
+
+---
+
+## A batch's status seems wrong
+
+**Symptom:** a batch shows **Curing** when you expected **Ready!**, or
+vice versa.
+
+### 1. The cure time setting changed
+
+Status depends on cure time. The default is 35 days, but it can be
+changed in Settings (see
+[I changed a factor and now the numbers don't look right](#i-changed-a-factor-and-now-the-numbers-dont-look-right)
+above — same kind of issue).
+
+If you recently changed the default cure time, batches without their
+own override will use the new value. To check: open **⚙ Settings** and
+look at the **Default cure time (days)** field.
+
+### 2. The batch has a per-batch override
+
+A specific batch can have its own cure time, separate from the
+default. Open the batch's detail view and look at the **Cure time**
+line — if it says something like "42 days (overridden — default is
+35)", that batch is using its own value.
+
+To remove the override and use the default again, click **Edit** next
+to the cure time and uncheck **Override cure time**, then **Save**.
+
+### 3. The date_made is wrong
+
+Batches are immutable on date once created — if you saved a batch with
+the wrong date, it can't be edited. The fix is to delete the batch
+and create a new one with the correct date.
+
+---
+
+## I can't edit a batch's date or ingredients
+
+**Symptom:** the batch detail view shows the date and ingredients as
+read-only — there's no way to change them.
+
+**This is intentional.** Batches are historical records of what you
+actually made. Allowing date or ingredient edits would silently change
+the historical record in ways that affect maturity calculations and
+break the trust that "this is what I actually did on that day."
+
+If you got something wrong when saving the batch, the fix is:
+
+1. Delete the incorrect batch (button at the bottom of the detail
+   view, in red).
+2. Create a new batch with the correct information.
+
+If the only thing wrong is the name, the cure-time override, or the
+notes — those **are** editable. Just the date and ingredients are
+locked.
+
+---
+
 ## I think I lost my saved recipes
 
 **Symptom:** the Load Recipe modal is empty, or shows fewer recipes than

@@ -12,6 +12,7 @@ feature — skim the table of contents and jump to the part you need.
 - [Measuring mode](#measuring-mode)
 - [Printing a recipe](#printing-a-recipe)
 - [Adjusting the factors](#adjusting-the-factors)
+- [Soap log (batches)](#soap-log-batches)
 - [Tips for kitchen use](#tips-for-kitchen-use)
 
 ---
@@ -268,6 +269,202 @@ edit them in Settings if your own recipe uses different ratios.
 If you change your mind and want the originals back, the **Reset to
 defaults** button in Settings restores every factor to the values from
 the source spreadsheet.
+
+---
+
+## Soap log (batches)
+
+The calculator can also keep a log of every batch you actually make —
+when you made it, what went into it, your notes, and where it is in
+its cure cycle.
+
+### What batches are
+
+A **recipe** is a template — "here are the ratios I use for my standard
+batch." Recipes live forever and you reuse them every time you make
+soap.
+
+A **batch** is a historical record — "on May 15th I actually made a
+batch of this soap." Each batch records the date you made it, the
+ingredients and amounts that went in, any notes you wanted to remember,
+and tracks the cure cycle from when you made it until it's ready to
+use.
+
+You don't have to use batches at all if you only need the calculator.
+But if you make soap more than occasionally, they're how you remember
+which batch was which six weeks later, and which ones are ready to cut
+and use.
+
+### The Batches tab
+
+The app has two tabs at the top: **Calculator** (the original) and
+**Batches** (the soap log). Click either to switch.
+
+Tab state is preserved as you switch — if you're mid-calculation on the
+Calculator and click over to Batches to check on something, your
+calculator inputs are still there when you come back.
+
+![Batches tab in dashboard view](images/batches-dashboard-desktop.png)
+
+### Maturity at a glance
+
+Soap needs time after you make it to fully cure. The default is **5
+weeks (35 days)**, but you can adjust that — globally in Settings, or
+per individual batch.
+
+Each batch shows where it is in its cure cycle:
+
+- A **progress bar** fills from "just made" to "fully cured."
+- A **colored status badge** tells you where it is at a glance.
+
+There are three statuses:
+
+- **Curing** (blue) — still in progress. The badge shows how many days
+  it's been: "Curing • 18 days."
+- **Ready!** (green) — fully cured, within two weeks of its ready date.
+  The badge says how long it's been ready: "Ready! • 3 days ago."
+- **Mature** (soft gray-green) — fully cured for more than two weeks.
+  Still ready to use, but recedes visually so newly-ready batches
+  stand out.
+
+The dashboard view above shows all three at a glance: a curing batch
+fading in from the top, a couple of ready batches in the middle, and
+mature batches at the bottom.
+
+### Starting a batch from a recipe
+
+The most common workflow. When you've just made a batch from a recipe,
+record it like this:
+
+1. Load (or calculate) the recipe in the Calculator tab.
+2. Click **Start a batch** in the recipe-actions row (next to Save
+   Recipe, Load Recipe, and Print).
+3. Give it a name — defaults to the recipe's name, or to "Batch made
+   [date]" if no recipe is loaded. Edit it however you like.
+4. Confirm the date made (defaults to today, but you can backdate).
+5. Add notes if you want — anything you'd like to remember about this
+   specific batch: which essential oil supplier you used, which mold,
+   how the trace behaved.
+6. Click **Start batch**.
+
+![Start a batch modal with recipe ingredients listed](images/start-a-batch-modal.png)
+
+The ingredients section in the modal shows exactly what will be
+recorded — a snapshot of the current calculator state in grams. This
+becomes the batch's permanent ingredient record.
+
+> **Advanced — overriding the cure time.** Most batches use the default
+> 35-day cure time. If you've made one that needs longer (a high-coconut
+> batch, say), expand the **Advanced** section and check **Override
+> cure time**, then type the number of days. This batch alone will use
+> the override; the global default is unchanged.
+
+### Recording a historical batch
+
+The second workflow. Use this for batches you made before installing
+the app, or any batch made off-recipe (mixed by feel, made from a
+recipe outside this app, etc.).
+
+1. Go to the **Batches** tab.
+2. Click **+ New batch**.
+3. Type a name and the date you actually made it — can be any past
+   date.
+4. Add ingredients one at a time using **+ Add ingredient**, or leave
+   the section empty if you don't remember (or don't have) the
+   details. Weights can be left blank too.
+5. Add notes. Click **Save batch**.
+
+![New batch modal with two ingredients added](images/new-batch-modal-with-ingredients.png)
+
+It's fine to have batches with no ingredients recorded at all — they
+show "(no ingredients recorded)" in the list and that's that. The
+date, name, and notes are usually what you actually want to remember.
+
+### Viewing and editing a batch
+
+Click any batch in the list to open its detail view.
+
+![Batch detail view for a Ready batch](images/batch-detail-ready.png)
+
+**What's editable on an existing batch:**
+
+- The **name** — click it to edit in place, press Enter or click
+  outside to save
+- The **notes** — edit in the textarea, autosaves when you click
+  outside
+- The **cure-time override** — click Edit next to the cure-time line
+
+**What's locked:**
+
+- The **date you made it**
+- The **list of ingredients and amounts**
+
+These are historical facts. Allowing edits would silently rewrite what
+you actually did on a specific day and quietly change maturity
+calculations. If you got the date or ingredients wrong when saving,
+the fix is to delete this batch and create a new one with the correct
+information.
+
+The **Delete batch** button is at the bottom of the detail view in
+red, with a confirmation prompt before it actually deletes.
+
+### Switching between Dashboard and Table views
+
+Above the batch list there's a **Dashboard / Table** toggle:
+
+- **Dashboard** — cards with prominent progress bars and status
+  badges, sorted by most recent first. Best for seeing what needs
+  attention at a glance.
+- **Table** — traditional sortable rows. Best for scanning a lot of
+  batches quickly or sorting by name or status.
+
+Your choice persists per device. If you prefer Table on your laptop
+and Dashboard on your phone, that works.
+
+### Searching and filtering
+
+The Batches tab has a search bar at the top. It searches across batch
+names, ingredient names, and notes simultaneously — so a search for
+**lavender** matches batches named Lavender Spring 2026, batches with
+"Bulgarian lavender EO" as an ingredient, and batches whose notes
+mention lavender.
+
+Below the search, click **Filters** to expand a panel with three
+filter types:
+
+- **Date range** — from/to dates to narrow by when you made batches.
+  Either bound can be left empty for open-ended.
+- **Status** — checkboxes for Curing, Ready, and Mature. Pick any
+  combination. Checking all three or none both mean "no status
+  filter."
+- **Ingredient** — substring match against ingredient names.
+
+![Filters expanded with two filters active](images/batches-filters-expanded.png)
+
+Filters combine with the search using AND. A search for "rosemary"
+with the Curing filter checked shows only currently-curing batches
+that have rosemary in the name, ingredients, or notes.
+
+When filters are active, you'll see a count next to the Filters label
+even from the collapsed view — for example **▸ Filters (2)** — so you
+always know when filtering is hiding things. A **Clear filters** link
+resets the filters without clearing the search; an extra Clear filters
+in the filtered-empty state ("No batches match your filters") resets
+both.
+
+### Tips for tracking batches
+
+- **Save a batch right after you make it** while the details are
+  fresh. You can always come back and add cure observations to the
+  notes later.
+- **Use notes for things you'd otherwise forget**: the lavender
+  supplier, that this was the batch where you used 90% lard for once,
+  that this batch was meant for the holidays.
+- **The dashboard status badge is the fastest way** to see what's
+  ready to use without opening anything.
+- **For batches from before you had this app**, just enter them as
+  historical. Partial ingredient info is fine — no ingredients at all
+  is fine. Name, date, and notes are usually what matters.
 
 ---
 

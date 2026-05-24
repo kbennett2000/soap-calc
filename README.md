@@ -19,12 +19,16 @@ again — handy for a permanent kitchen-counter appliance.
 - Heavy / Light essential oil toggle
 - Grams or ounces, switchable on the fly (storage is always in grams)
 - Save and load named recipes, with optional notes
+- Soap log: track every batch you make, see at a glance what's curing vs.
+  ready to use, and search past batches by name, ingredient, or notes
 - Measuring mode — locks the inputs and shows tappable checkboxes for working
   through a recipe at the counter
 - Printable recipe sheets with a Measured-checkbox column for ticking off
   ingredients in pen as you weigh them
 - 100% offline after install — no internet connection ever required
 - Accessible from any device on your home network, no app to install
+
+![Batches tab — track every batch and watch it cure](docs/images/batches-dashboard-desktop.png)
 
 ## Quick start
 
