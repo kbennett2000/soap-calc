@@ -1,6 +1,12 @@
 # Soap Calculator
 
-An offline-first soap recipe scaler for home use.
+![Node.js](https://img.shields.io/badge/Node.js-20%20%7C%2022%20LTS-339933?logo=node.js&logoColor=white)
+![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
+![Offline](https://img.shields.io/badge/offline-100%25-blue)
+![Build](https://img.shields.io/badge/build-none-lightgrey)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+A self-hosted, offline-first soap recipe scaler for cold-process soapmaking at home.
 
 ![Soap Calculator main view](docs/images/main-view-desktop.png)
 
@@ -8,9 +14,9 @@ An offline-first soap recipe scaler for home use.
 
 A small browser-based calculator that replaces the spreadsheet workflow for
 scaling a soap recipe from one anchor ingredient. It runs as a tiny Node.js
-service on a home Ubuntu Server and is reachable from any phone, tablet, or
-laptop on the same network. After install it never touches the internet
-again — handy for a permanent kitchen-counter appliance.
+service on a home Ubuntu Server (or any homelab box) and is reachable from any
+phone, tablet, or laptop on the same network. After install it never touches
+the internet again — handy for a permanent kitchen-counter appliance.
 
 ## Key features
 
@@ -49,4 +55,4 @@ deployment layout — see [SPEC.md](SPEC.md).
 
 ## License
 
-License: not yet specified.
+MIT — see [LICENSE](LICENSE).
