@@ -1,12 +1,18 @@
-# Soap Calculator
+<p align="center">
+  <img src="docs/images/banner.svg" alt="Soap Calculator — offline-first soap recipe scaler for home cold-process soapmaking" width="820">
+</p>
 
-![Node.js](https://img.shields.io/badge/Node.js-20%20%7C%2022%20LTS-339933?logo=node.js&logoColor=white)
-![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
-![Offline](https://img.shields.io/badge/offline-100%25-blue)
-![Build](https://img.shields.io/badge/build-none-lightgrey)
-![License](https://img.shields.io/badge/license-MIT-green)
+<p align="center">
+  <img src="https://img.shields.io/badge/Node.js-20%20%7C%2022%20LTS-339933?logo=node.js&logoColor=white" alt="Node.js 20 | 22 LTS">
+  <img src="https://img.shields.io/badge/dependencies-0-brightgreen" alt="0 dependencies">
+  <img src="https://img.shields.io/badge/offline-100%25-blue" alt="100% offline">
+  <img src="https://img.shields.io/badge/build-none-lightgrey" alt="No build step">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license">
+</p>
 
-A self-hosted, offline-first soap recipe scaler for cold-process soapmaking at home.
+<p align="center">
+  A self-hosted, offline-first soap recipe scaler for cold-process soapmaking at home.
+</p>
 
 ![Soap Calculator main view](docs/images/main-view-desktop.png)
 
@@ -47,6 +53,7 @@ network to use it.
 - [Install guide](docs/INSTALL.md) — step-by-step setup on a fresh Ubuntu Server
 - [User guide](docs/USER_GUIDE.md) — features and day-to-day workflows
 - [Troubleshooting](docs/TROUBLESHOOTING.md) — common problems and fixes
+- [Changelog](CHANGELOG.md) — release history
 
 ## Specification
 
